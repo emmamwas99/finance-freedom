@@ -28,7 +28,7 @@ export const SITE = {
   currency: 'KES',
   themeColor: '#0a3c6e',
   supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? 'support@yourdomain.co.ke', // TODO: your support address
-  company: 'Your Company Ltd', // TODO: registered business name
+  company: 'EMANET',
   /** Official profiles (X, LinkedIn, Facebook…). Used for Organization `sameAs`. Add real URLs only. */
   sameAs: [] as string[],
   /** X/Twitter handle without @, if you have one. */

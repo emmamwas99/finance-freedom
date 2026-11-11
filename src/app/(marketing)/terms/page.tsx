@@ -12,7 +12,7 @@ export default function TermsPage() {
   return (
     <LegalLayout title="Terms of Service" path={page.path} description={page.description} updated={page.updated}>
       <p>
-        These terms are an agreement between you and {BRAND.company} (“we”), a company registered in Kenya, for your use of {BRAND.name} (the “Service”).
+        These terms are an agreement between you and {BRAND.company} (“we”), which operates {BRAND.name} (the “Service”).
       </p>
       <section>
         <h2>1. The Service</h2>

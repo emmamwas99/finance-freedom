@@ -31,7 +31,7 @@ export function SiteFooter() {
       <div className="border-t">
         <div className="mx-auto grid max-w-6xl gap-2 px-4 py-6 text-[13px] text-muted-foreground sm:px-6">
           <p>
-            © {new Date().getFullYear()} {SITE.company}. Made in {SITE.country}.
+            © {new Date().getFullYear()} {SITE.company}. {SITE.name} is a product of {SITE.company}. Made in {SITE.country}.
           </p>
           <p>{SITE.name} provides budgeting tools and general education. It is not a bank or lender and does not give financial, tax or legal advice. Calculators are estimates based on the numbers and assumptions you enter.</p>
         </div>

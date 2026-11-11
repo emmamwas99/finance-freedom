@@ -35,7 +35,7 @@ export default function AboutPage() {
         </ul>
         <p>Spotted a mistake? Please <A href="/contact">tell us</A> and we’ll fix it.</p>
         <h2 id="company">Who we are</h2>
-        <p>{SITE.name} is run by {SITE.company}, a company registered in {SITE.country}. You can reach us at <a href={`mailto:${SITE.supportEmail}`}>{SITE.supportEmail}</a>.</p>
+        <p>{SITE.name} is a product of {SITE.company}. You can reach us at <a href={`mailto:${SITE.supportEmail}`}>{SITE.supportEmail}</a>.</p>
       </Prose>
       <div className="mt-14">
         <CtaBanner />
