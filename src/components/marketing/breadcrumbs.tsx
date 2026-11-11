@@ -8,7 +8,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
   const all = [{ name: 'Home', path: '/' }, ...items]
   return (
     <>
-      <nav aria-label="Breadcrumb" className="text-[14px] text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="hidden text-[14px] text-muted-foreground md:block">
         <ol className="flex flex-wrap items-center gap-1">
           {all.map((c, i) => {
             const last = i === all.length - 1
