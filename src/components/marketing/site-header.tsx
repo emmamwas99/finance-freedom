@@ -9,6 +9,8 @@ import { MAIN_NAV, SITE } from '@/config/site'
 import { cn } from '@/lib/utils'
 import { MobileNav } from './mobile-nav'
 
+const MOBILE_TAB_ROOTS = new Set(['/', '/calculators', '/learn', '/pricing'])
+
 function backFallback(path: string) {
   if (path.startsWith('/blog/')) return '/blog'
   if (path.startsWith('/guides/')) return '/guides'
@@ -45,10 +47,11 @@ export function SiteHeader() {
   }, [path])
 
   const navy = path !== '/' || pastHero
+  const showMobileBack = !MOBILE_TAB_ROOTS.has(path)
 
   return (
     <>
-      <header className={cn('sticky top-0 z-40 border-b', path !== '/' && 'hidden md:block', navy ? 'border-white/10 bg-navy text-white' : 'finfe-header-light border-[#e4eef7] text-navy')}>
+      <header className={cn('sticky top-0 z-40 border-b', showMobileBack && 'hidden md:block', navy ? 'border-white/10 bg-navy text-white' : 'finfe-header-light border-[#e4eef7] text-navy')}>
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2 text-[17px] font-semibold" aria-label={`${SITE.name} home`}>
             <Image src={navy ? '/logo-inverse.svg' : '/logo.svg'} alt="" width={28} height={28} className="size-7 rounded-md" priority />
@@ -74,7 +77,7 @@ export function SiteHeader() {
           </Link>
         </div>
       </header>
-      {path !== '/' && (
+      {showMobileBack && (
         <header className="finfe-header-light sticky top-0 z-40 border-b border-[#e4eef7] text-navy md:hidden">
           <div className="mx-auto flex h-16 max-w-6xl items-center px-4">
             <Link
