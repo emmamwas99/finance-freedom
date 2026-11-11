@@ -1,33 +1,60 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { MAIN_NAV, SITE } from '@/config/site'
+import { cn } from '@/lib/utils'
 import { MobileNav } from './mobile-nav'
 
 export function SiteHeader() {
+  const path = usePathname()
+  const [pastHero, setPastHero] = useState(false)
+
+  useEffect(() => {
+    if (path !== '/') return
+    const hero = document.querySelector('.finfe-hero')
+    if (!hero) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setPastHero(!entry.isIntersecting),
+      { rootMargin: '-64px 0px 0px 0px' },
+    )
+    observer.observe(hero)
+    return () => observer.disconnect()
+  }, [path])
+
+  const navy = path !== '/' || pastHero
+
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-navy text-white">
-      <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 text-[17px] font-semibold" aria-label={`${SITE.name} home`}>
-          <Image src="/logo-inverse.svg" alt="" width={28} height={28} className="size-7 rounded-md" priority />
-          {SITE.name}
-        </Link>
-        <nav aria-label="Main" className="hidden items-center gap-6 text-[15px] text-white/85 md:flex">
-          {MAIN_NAV.map((it) => (
-            <Link key={it.href} href={it.href} className="hover:text-white">
-              {it.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="hidden items-center gap-2 md:flex">
-          <Link href="/login" prefetch={false} className="rounded-lg px-3 py-2 text-[15px] text-white/90 hover:bg-white/10">
-            Log in
+    <>
+      <header className={cn('sticky top-0 z-40 border-b', navy ? 'border-white/10 bg-navy text-white' : 'finfe-header-light border-[#e4eef7] text-navy')}>
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2 text-[17px] font-semibold" aria-label={`${SITE.name} home`}>
+            <Image src={navy ? '/logo-inverse.svg' : '/logo.svg'} alt="" width={28} height={28} className="size-7 rounded-md" priority />
+            {SITE.name}
           </Link>
-          <Link href="/signup" prefetch={false} className="rounded-lg bg-primary px-4 py-2 text-[15px] font-medium text-white hover:bg-primary/90">
+          <nav aria-label="Main" className={cn('hidden items-center gap-6 text-[15px] md:flex', navy ? 'text-white/85' : 'text-navy/80')}>
+            {MAIN_NAV.map((it) => (
+              <Link key={it.href} href={it.href} className={navy ? 'hover:text-white' : 'hover:text-primary'}>
+                {it.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="hidden items-center gap-2 md:flex">
+            <Link href="/login" prefetch={false} className={cn('rounded-lg px-3 py-2 text-[15px]', navy ? 'text-white/90 hover:bg-white/10' : 'text-navy hover:bg-navy/5')}>
+              Log in
+            </Link>
+            <Link href="/signup" prefetch={false} className="rounded-lg bg-primary px-4 py-2 text-[15px] font-medium text-white hover:bg-primary/90">
+              Start free
+            </Link>
+          </div>
+          <Link href="/signup" prefetch={false} className="inline-flex min-h-9 items-center rounded-full bg-primary px-4 text-[13px] font-medium text-white hover:bg-primary/90 md:hidden">
             Start free
           </Link>
         </div>
-        <MobileNav items={MAIN_NAV} />
-      </div>
-    </header>
+      </header>
+      <MobileNav />
+    </>
   )
 }

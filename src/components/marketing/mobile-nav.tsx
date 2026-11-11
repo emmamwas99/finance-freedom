@@ -1,43 +1,47 @@
 'use client'
 
-import { Menu, X } from 'lucide-react'
+import { BookOpen, Calculator, CircleUserRound, House, Tags } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
-import type { NavItem } from '@/config/site'
+import { cn } from '@/lib/utils'
 
-/** Small client island: the only JavaScript in the public header. */
-export function MobileNav({ items }: { items: NavItem[] }) {
-  const [open, setOpen] = useState(false)
+const tabs = [
+  { href: '/', label: 'Home', icon: House },
+  { href: '/calculators', label: 'Tools', icon: Calculator },
+  { href: '/learn', label: 'Learn', icon: BookOpen },
+  { href: '/pricing', label: 'Pricing', icon: Tags },
+  { href: '/login', label: 'Account', icon: CircleUserRound },
+]
+
+function selected(path: string, href: string) {
+  if (href === '/') return path === '/'
+  if (href === '/calculators') return path.startsWith('/calculators') || path === '/financial-health'
+  if (href === '/learn') return ['/learn', '/guides', '/blog', '/glossary', '/budgeting', '/personal-finance', '/debt-management', '/saving-money', '/financial-freedom'].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
+  return path === href
+}
+
+/** Fixed navigation for public pages on phones; account pages have their own layout. */
+export function MobileNav() {
   const path = usePathname()
-  // close the menu after navigating (state derived from the path, no effect needed)
-  const [shownFor, setShownFor] = useState(path)
-  if (shownFor !== path) {
-    setShownFor(path)
-    setOpen(false)
-  }
   return (
-    <div className="md:hidden">
-      <button type="button" className="flex size-10 items-center justify-center rounded-md" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? 'Close menu' : 'Open menu'}>
-        {open ? <X /> : <Menu />}
-      </button>
-      {open && (
-        <nav id="mobile-menu" aria-label="Main" className="absolute inset-x-0 top-16 grid gap-1 border-t border-white/10 bg-navy px-4 py-3 shadow-lg">
-          {items.map((it) => (
-            <Link key={it.href} href={it.href} className="rounded-md px-2 py-2.5 text-white/90 hover:bg-white/10" aria-current={path === it.href ? 'page' : undefined}>
-              {it.label}
+    <nav aria-label="Mobile navigation" className="fixed inset-x-0 bottom-0 z-50 border-t border-navy/10 bg-white/95 pb-safe shadow-[0_-8px_28px_rgba(10,60,110,0.08)] backdrop-blur-xl md:hidden print:hidden">
+      <div className="mx-auto grid max-w-lg grid-cols-5 px-1.5">
+        {tabs.map(({ href, label, icon: Icon }) => {
+          const active = selected(path, href)
+          return (
+            <Link
+              key={href}
+              href={href}
+              prefetch={href === '/login' ? false : undefined}
+              aria-current={active ? 'page' : undefined}
+              className={cn('flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary', active ? 'text-primary' : 'text-muted-foreground hover:text-navy')}
+            >
+              <Icon aria-hidden className="size-5" />
+              {label}
             </Link>
-          ))}
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <Link href="/login" prefetch={false} className="rounded-lg border border-white/30 px-3 py-2.5 text-center text-white">
-              Log in
-            </Link>
-            <Link href="/signup" prefetch={false} className="rounded-lg bg-primary px-3 py-2.5 text-center font-medium text-white">
-              Start free
-            </Link>
-          </div>
-        </nav>
-      )}
-    </div>
+          )
+        })}
+      </div>
+    </nav>
   )
 }

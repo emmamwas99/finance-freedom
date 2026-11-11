@@ -137,6 +137,10 @@
     linear-gradient(125deg, #f9fbff 4%, #f0f7ff 54%, #e8f2fc 100%);
 }
 
+.finfe-header-light {
+  background: linear-gradient(100deg, #f9fbff 0%, #f7fbff 60%, #fdfefe 100%);
+}
+
 .finfe-hero::before {
   content: '';
   position: absolute;
