@@ -43,25 +43,25 @@ const TOPIC_LINKS = [
 export default function HomePage() {
   return (
     <>
-      <section className="bg-navy text-white">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
-          <div>
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[13px] text-white/90">
-              <Lock aria-hidden className="size-3.5" /> Secure sync. Built for Kenya
+      <section className="finfe-hero relative isolate overflow-hidden text-navy">
+        <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-4 pt-11 pb-14 sm:px-6 sm:py-20 lg:min-h-[620px] lg:grid-cols-2 lg:gap-16 lg:py-24">
+          <div className="max-w-xl">
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white/75 px-3 py-1.5 text-[13px] font-medium text-navy shadow-sm">
+              <Lock aria-hidden className="size-3.5 text-primary" /> Secure sync. Built for Kenya
             </p>
-            <h1 className="text-[34px] leading-[1.1] font-semibold tracking-tight sm:text-5xl">{SITE.tagline}</h1>
-            <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-white/85">
+            <h1 className="text-[36px] leading-[1.08] font-semibold tracking-tight sm:text-5xl lg:text-[54px]">{SITE.tagline}</h1>
+            <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-[#45576c]">
               {SITE.name} ({SITE.nameMeaning}) is a budget planner for salaried Kenyans. Plan your salary before it arrives, track daily expenses, clear your loans faster, and stop borrowing to get through the month.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/signup" prefetch={false} className="inline-flex h-12 items-center gap-2 rounded-lg bg-primary px-6 text-base font-medium text-white hover:bg-primary/90">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link href="/signup" prefetch={false} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-center text-base font-medium text-white shadow-[0_10px_24px_rgba(20,112,168,0.2)] transition-colors hover:bg-navy sm:w-auto">
                 Start free: {TRIAL_DAYS} days of Pro <ArrowRight aria-hidden className="size-4" />
               </Link>
-              <Link href="/login" prefetch={false} className="inline-flex h-12 items-center rounded-lg border border-white/30 px-6 text-base text-white hover:bg-white/10">
+              <Link href="/login" prefetch={false} className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-navy/15 bg-white/70 px-6 py-2.5 text-base text-navy transition-colors hover:bg-white sm:w-auto">
                 Log in
               </Link>
             </div>
-            <p className="mt-4 text-sm text-white/70">No card needed · Pay with M-Pesa or card · Cancel any time</p>
+            <p className="mt-4 text-sm text-[#52677a]">No card needed · Pay with M-Pesa or card · Cancel any time</p>
           </div>
           <HeroMock />
         </div>

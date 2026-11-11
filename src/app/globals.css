@@ -130,6 +130,36 @@
   padding-top: env(safe-area-inset-top);
 }
 
+.finfe-hero {
+  background:
+    radial-gradient(ellipse 55% 85% at 82% 7%, rgba(255, 255, 255, 0.95), transparent 78%),
+    radial-gradient(ellipse 78% 70% at -12% 105%, rgba(155, 204, 243, 0.46), transparent 75%),
+    linear-gradient(125deg, #f9fbff 4%, #f0f7ff 54%, #e8f2fc 100%);
+}
+
+.finfe-hero::before {
+  content: '';
+  position: absolute;
+  top: -18%;
+  left: -37%;
+  width: min(100rem, 105vw);
+  height: 135%;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.3), rgba(175, 216, 247, 0.24));
+  pointer-events: none;
+  transform: rotate(-24deg);
+}
+
+@media (max-width: 639px) {
+  .finfe-hero::before {
+    top: 20%;
+    left: -75%;
+    width: 145%;
+    height: 95%;
+  }
+}
+
 @media print {
   body {
     background: #fff;
