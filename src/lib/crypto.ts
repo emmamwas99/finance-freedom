@@ -9,6 +9,10 @@ const dec = new TextDecoder()
 
 export const KDF_ITERATIONS = 310_000
 
+/**
+ * PROTOCOL CONSTANT: 'finance-freedom' identifies backup files made by every version of the app
+ * (the product was renamed Finfe). Never change it, or older backups stop being recognised.
+ */
 export interface Vault {
   app: 'finance-freedom'
   v: 1

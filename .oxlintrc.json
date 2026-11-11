@@ -1,8 +1,39 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
+  "plugins": [
+    "react",
+    "typescript",
+    "oxc",
+    "nextjs",
+    "jsx-a11y",
+    "import"
+  ],
+  "ignorePatterns": [
+    ".next/**",
+    "node_modules/**",
+    ".backup/**",
+    "supabase/functions/*/index.ts",
+    "playwright-report/**",
+    "test-results/**"
+  ],
   "rules": {
     "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+    "react/exhaustive-deps": "warn",
+    "react/only-export-components": "off",
+    "nextjs/no-img-element": "error",
+    "nextjs/no-html-link-for-pages": "error",
+    "jsx-a11y/alt-text": "error",
+    "jsx-a11y/anchor-is-valid": "error",
+    "jsx-a11y/heading-has-content": "error",
+    "jsx-a11y/html-has-lang": "error",
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/no-autofocus": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "import/no-cycle": "off",
+    "react/purity": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "jsx-a11y/no-noninteractive-tabindex": "off",
+    "jsx-a11y/control-has-associated-label": "off"
   }
 }

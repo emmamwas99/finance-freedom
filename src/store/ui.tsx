@@ -1,8 +1,27 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+'use client'
+
+import { usePathname, useRouter } from 'next/navigation'
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import type { Expense, Income } from '@/lib/types'
 
-export type Route = 'home' | 'activity' | 'plan' | 'freedom' | 'stats' | 'insights' | 'settings'
-const ROUTES: Route[] = ['home', 'activity', 'plan', 'freedom', 'stats', 'insights', 'settings']
+export type Route = 'home' | 'activity' | 'plan' | 'freedom' | 'stats' | 'insights' | 'settings' | 'billing'
+
+/** Private app routes. Kept identical to the Vite app so bookmarks and the Paystack return URL still work. */
+export const ROUTE_PATHS: Record<Route, string> = {
+  home: '/app',
+  plan: '/app/plan',
+  activity: '/app/transactions',
+  freedom: '/app/debts',
+  stats: '/app/reports',
+  insights: '/app/on-track',
+  settings: '/app/settings',
+  billing: '/app/billing',
+}
+
+export function routeFromPath(path: string): Route {
+  const hit = (Object.entries(ROUTE_PATHS) as [Route, string][]).find(([, p]) => p === path.replace(/\/$/, ''))
+  return hit?.[0] ?? 'home'
+}
 
 export type TxRequest =
   | { kind: 'expense'; id?: string; preset?: Partial<Expense> }
@@ -18,27 +37,15 @@ interface UICtx {
 
 const Ctx = createContext<UICtx | null>(null)
 
-function readHash(): Route {
-  const h = window.location.hash.replace('#/', '').replace('#', '') as Route
-  return ROUTES.includes(h) ? h : 'home'
-}
-
 export function UIProvider({ children }: { children: ReactNode }) {
-  const [route, setRoute] = useState<Route>(readHash)
+  const path = usePathname()
+  const router = useRouter()
+  const route = routeFromPath(path)
   const [tx, setTx] = useState<TxRequest | null>(null)
-
-  useEffect(() => {
-    const on = () => setRoute(readHash())
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
-  }, [])
-
-  const go = useCallback((r: Route) => {
-    window.location.hash = `/${r}`
-    window.scrollTo({ top: 0 })
-  }, [])
-
-  return <Ctx.Provider value={{ route, go, tx, openTx: setTx, closeTx: () => setTx(null) }}>{children}</Ctx.Provider>
+  const go = useCallback((r: Route) => router.push(ROUTE_PATHS[r]), [router])
+  const closeTx = useCallback(() => setTx(null), [])
+  const value = useMemo(() => ({ route, go, tx, openTx: setTx, closeTx }), [route, go, tx, closeTx])
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
 export function useUI() {

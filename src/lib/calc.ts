@@ -1,6 +1,9 @@
 import { getDaysInMonth } from 'date-fns'
 import { currentMonth, monthLabel, monthOf, shiftMonth } from './format'
 import type { AppData, Bill, Category, CategoryKind, Expense, Loan } from './types'
+import { monthsToClear, simulateDebts } from './calculators/debt'
+
+export { monthsToClear }
 
 export interface MonthSummary {
   key: string
@@ -186,16 +189,6 @@ export function loanBalance(data: AppData, loan: Loan) {
   return Math.max(0, loan.amount - loanPaid(data, loan.id))
 }
 
-/** Months to clear a balance with a fixed monthly payment. Infinity = never (payment too small). */
-export function monthsToClear(balance: number, payment: number, annualRate: number) {
-  if (balance <= 0) return 0
-  if (payment <= 0) return Infinity
-  const r = annualRate / 100 / 12
-  if (r === 0) return Math.ceil(balance / payment)
-  if (payment <= balance * r) return Infinity
-  return Math.ceil(-Math.log(1 - (r * balance) / payment) / Math.log(1 + r))
-}
-
 export function openLoans(data: AppData) {
   return data.loans
     .filter((l) => !l.closed)
@@ -217,38 +210,13 @@ export function debtOverview(data: AppData) {
 
 /** Month-by-month projection of total debt if you keep paying the planned monthly amounts. */
 export function debtProjection(data: AppData, extraPerMonth = 0, maxMonths = 120) {
-  const loans = openLoans(data).map((l) => ({
-    bal: l.balance,
-    pay: l.loan.monthlyPayment,
-    r: l.loan.interestRate / 100 / 12,
-  }))
-  const out: { key: string; label: string; total: number }[] = []
-  let key = currentMonth()
-  const total = () => loans.reduce((s, l) => s + l.bal, 0)
-  out.push({ key, label: monthLabel(key, 'short'), total: total() })
-  for (let i = 0; i < maxMonths && total() > 0.5; i++) {
-    let extra = extraPerMonth
-    // avalanche: extra goes to the highest-interest loan first
-    const order = [...loans].sort((a, b) => b.r - a.r)
-    for (const l of loans) {
-      if (l.bal <= 0) continue
-      l.bal = l.bal * (1 + l.r) - l.pay
-      if (l.bal < 0) {
-        extra += -l.bal
-        l.bal = 0
-      }
-    }
-    for (const l of order) {
-      if (extra <= 0) break
-      if (l.bal <= 0) continue
-      const use = Math.min(extra, l.bal)
-      l.bal -= use
-      extra -= use
-    }
-    key = shiftMonth(key, 1)
-    out.push({ key, label: monthLabel(key, 'short'), total: Math.max(0, total()) })
-  }
-  return out
+  const loans = openLoans(data).map((l) => ({ balance: l.balance, payment: l.loan.monthlyPayment, annualRate: l.loan.interestRate }))
+  const { totals } = simulateDebts(loans, { extraPerMonth, maxMonths })
+  const start = currentMonth()
+  return totals.map((total, i) => {
+    const key = shiftMonth(start, i)
+    return { key, label: monthLabel(key, 'short'), total }
+  })
 }
 
 // ---------- Goals ----------

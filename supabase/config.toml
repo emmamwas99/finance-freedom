@@ -1,0 +1,15 @@
+# Minimal Supabase CLI config. `npx supabase link --project-ref <ref>` then `npx supabase db push`
+# and `npx supabase functions deploy`. See SAAS-SETUP.md.
+project_id = "finance-freedom"
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**"]
+minimum_password_length = 8
+
+[auth.email]
+enable_confirmations = true
+
+# Paystack calls this without a Supabase JWT; it is authenticated by the Paystack signature.
+[functions.paystack-webhook]
+verify_jwt = false
