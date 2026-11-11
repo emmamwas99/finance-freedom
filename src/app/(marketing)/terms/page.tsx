@@ -22,7 +22,7 @@ export default function TermsPage() {
         <h2>2. Your account</h2>
         <ul>
           <li>You must be 18 or older and give a valid email address.</li>
-          <li>Your data is encrypted with your password. You are responsible for keeping your password and recovery key safe. If you lose both, we cannot recover your data.</li>
+          <li>Your vault backup is encrypted on your device and your password helps unlock it. We also store readable finance records for reports. Keep your password and recovery key safe: without them, the encrypted vault backup cannot be reopened.</li>
           <li>Do not share your account or try to access another person’s account.</li>
         </ul>
       </section>
@@ -48,7 +48,7 @@ export default function TermsPage() {
       </section>
       <section>
         <h2>6. Ending your account</h2>
-        <p>You can delete your account at any time in Settings, which permanently deletes your encrypted data. We may suspend accounts that break these terms.</p>
+        <p>You can delete your account at any time in Settings. This deletes the encrypted vault backup and finance records stored for reports. We may suspend accounts that break these terms.</p>
       </section>
       <section>
         <h2>7. Law</h2>

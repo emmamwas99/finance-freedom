@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: '/app',
     name: SITE.name,
     short_name: SITE.shortName,
-    description: 'Private, encrypted budget planner to plan your money and get debt-free.',
+    description: 'Budget planner with synced records, reports and an encrypted vault backup.',
     lang: SITE.language,
     start_url: '/app',
     scope: '/',

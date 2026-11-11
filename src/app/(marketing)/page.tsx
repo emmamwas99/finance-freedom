@@ -1,4 +1,4 @@
-import { ArrowRight, BarChart3, BellRing, Calculator, CalendarCheck, CloudOff, Compass, EyeOff, HeartPulse, KeyRound, ListChecks, Lock, Mountain, PiggyBank, Tags, Timer, Zap } from 'lucide-react'
+import { ArrowRight, BarChart3, BellRing, Calculator, CalendarCheck, CloudOff, Compass, Database, HeartPulse, KeyRound, ListChecks, Lock, Mountain, PiggyBank, Tags, Timer, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { CtaBanner } from '@/components/marketing/cta'
 import { FaqSection } from '@/components/marketing/faq'
@@ -24,11 +24,11 @@ const STEPS = [
 ]
 
 const FAQ = [
-  { q: 'Can you see my financial data?', a: 'When server reports are enabled, we store readable transaction data so we can calculate them. Your vault backup is also encrypted on your device. The local demo keeps everything in your browser.' },
-  { q: 'What if I forget my password?', a: 'When you sign up you get a recovery key. Use it with the reset link we email you to choose a new password and reopen your encrypted vault. If you lose both, the old vault cannot be decrypted.' },
+  { q: 'Can you see my financial data?', a: 'Yes. Finfe stores readable finance records in our database to calculate reports. We also keep an encrypted vault backup for syncing and recovery. We do not receive your password or recovery key. The free calculators are separate and run in your browser.' },
+  { q: 'What if I forget my password?', a: 'Use the reset link we email you and the recovery key from signup to reopen your encrypted vault. Without the recovery key, you can reset your account and start fresh, but the old vault cannot be unlocked.' },
   { q: 'How do I pay?', a: 'With M-Pesa or a card through Paystack. M-Pesa payments cover one month or one year at a time, and we remind you before it ends. Card payments can renew automatically.' },
-  { q: 'Can I cancel?', a: 'Yes, at any time. You keep Pro until the end of the period you paid for, then move to the free plan. Your data is never deleted unless you delete your account.' },
-  { q: 'Does it work offline?', a: 'Yes. Your recent data is kept encrypted on your device, so you can record expenses without internet. It syncs when you’re back online.' },
+  { q: 'Can I cancel?', a: 'Yes, at any time. You keep Pro until the end of the period you paid for, then move to the free plan. Your account and records remain available on the free plan.' },
+  { q: 'Does it work offline?', a: 'Yes. A recent encrypted copy stays on your device so you can record expenses without internet. When you reconnect, changes sync to your account and the finance records used for reports are saved in our database.' },
   { q: 'Does it connect to my bank or M-Pesa?', a: 'No. You record what you spend yourself, which is what makes you think twice before spending.' },
 ]
 
@@ -47,7 +47,7 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
           <div>
             <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[13px] text-white/90">
-              <Lock aria-hidden className="size-3.5" /> Private and encrypted. Built for Kenya
+              <Lock aria-hidden className="size-3.5" /> Secure sync. Built for Kenya
             </p>
             <h1 className="text-[34px] leading-[1.1] font-semibold tracking-tight sm:text-5xl">{SITE.tagline}</h1>
             <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-white/85">
@@ -161,18 +161,18 @@ export default function HomePage() {
 
             <Showcase
               id="security"
-              accent="Keep"
-              title="it private"
-              subtitle="Your vault backup is encrypted on your device. Server reports use readable transaction data."
+              accent="Know"
+              title="where your data goes"
+              subtitle="Your vault backup is encrypted. Your finance records are stored in our database for reports."
               visual={<PrivacyVisual />}
               tiles={[
                 { icon: Lock, label: 'Encrypted vault backup' },
-                { icon: EyeOff, label: 'Clear data use for reports' },
-                { icon: KeyRound, label: 'Recovery key and auto-lock' },
+                { icon: Database, label: 'Records for server reports' },
+                { icon: KeyRound, label: 'Password stays on your device' },
               ]}
               cta={{ href: '/about#privacy', label: 'How we protect your data' }}
             >
-              Your data is encrypted with AES-256 using a key made from your password, before anything leaves your phone or computer. Our servers only ever hold scrambled text. Your password never leaves your device, and you can delete everything at any time.
+              We encrypt your vault backup on your device before upload. We also save readable categories, transactions, budgets, loans, goals and plans in our database so we can calculate reports. Your password and recovery key are not sent to us. You can delete your account and its finance records in Settings.
             </Showcase>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function HomePage() {
             ]}
             cta={{ href: '/calculators', label: 'See all free tools' }}
           >
-            Budget, savings, emergency fund, debt payoff and financial freedom calculators, plus a two-minute financial health check. They run in your browser, nothing is sent anywhere, and your last numbers are remembered on your device for next time.
+            Budget, savings, emergency fund, debt payoff and financial freedom calculators, plus a two-minute financial health check. These free tools run separately from your account: their inputs stay in your browser, and your last numbers are remembered on your device for next time.
           </Showcase>
         </div>
       </section>

@@ -42,7 +42,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string[]
           <div style={{ fontSize: title.length > 60 ? 54 : 64, lineHeight: 1.12, fontWeight: 700, maxWidth: 1000 }}>{title}</div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 24, color: 'rgba(255,255,255,0.75)' }}>
-          <span>Private, encrypted budgeting for Kenya</span>
+          <span>Budget planning and reports for Kenya</span>
           <span>{SITE.url.replace(/^https?:\/\//, '')}</span>
         </div>
       </div>

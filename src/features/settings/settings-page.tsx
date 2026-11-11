@@ -184,7 +184,7 @@ export function SettingsPage() {
         <CardHeader>
           <CardTitle className="text-base text-navy">Backup & export</CardTitle>
           <CardDescription>
-            Your data is already backed up (encrypted) in your account. You can also keep your own copy.
+            Your encrypted vault backup is saved in your account. You can also keep your own copy.
             {st.lastBackupAt && <> Last file backup: <b>{new Date(st.lastBackupAt).toLocaleDateString()}</b>.</>}
           </CardDescription>
         </CardHeader>

@@ -1,4 +1,4 @@
-import { BarChart3, BellRing, CloudOff, EyeOff, KeyRound, Lock, Smartphone, Tags, Zap } from 'lucide-react'
+import { BarChart3, BellRing, CloudOff, Database, KeyRound, Lock, Smartphone, Tags, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/marketing/breadcrumbs'
 import { CtaBanner } from '@/components/marketing/cta'
@@ -20,7 +20,7 @@ export const metadata = buildMetadata(page)
 const FAQ = [
   { q: 'Is there a free expense tracker?', a: `Yes. Finfe’s Free plan includes unlimited expenses, income and loans, spending limits with warnings, and the monthly plan. Pro adds reports and the “Am I on track?” check, with a ${TRIAL_DAYS}-day free trial.` },
   { q: 'Does it read my M-Pesa messages or connect to my bank?', a: 'No. You record each expense yourself. That takes a few seconds and makes you notice every shilling, which is the point. It also means no one else ever needs access to your accounts.' },
-  { q: 'Can I track expenses offline?', a: 'Yes. Recent data is stored encrypted on your device, so you can record expenses with no internet. Changes sync automatically when you reconnect.' },
+  { q: 'Can I track expenses offline?', a: 'Yes. A recent encrypted copy stays on your device so you can record expenses without internet. When you reconnect, changes sync and the finance records used for reports are saved in our database.' },
   { q: 'What if I forget to record some spending?', a: 'Add it as one “untracked spending” amount for that month so your totals are still right, then pick the habit back up. It’s better than abandoning the month.' },
   { q: 'Can I export my expenses?', a: 'Yes. Pro includes a spreadsheet (CSV) export and encrypted backups you can keep yourself.' },
 ]
@@ -61,7 +61,7 @@ export default function ExpenseTrackerPage() {
       <div className="mt-6 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <PageIntro
           title="An expense tracker that warns you before you overspend"
-          lead="Finfe is an expense tracker for Kenya: record daily spending in KSh in a few seconds, sort it into needs and wants, and get a warning at 80% of any limit. It works offline, and your records are encrypted on your device."
+          lead="Finfe is an expense tracker for Kenya: record daily spending in KSh in a few seconds, sort it into needs and wants, and get a warning at 80% of any limit. It works offline and syncs your records to your account."
         >
           <div className="flex flex-wrap gap-3">
             <Link href="/signup" prefetch={false} className="inline-flex h-12 items-center rounded-lg bg-primary px-6 text-base font-medium text-white hover:bg-primary/90">
@@ -113,18 +113,18 @@ export default function ExpenseTrackerPage() {
           </Showcase>
           <Showcase
             id="private"
-            accent="Private"
-            title="by design"
-            subtitle="Your vault backup is encrypted on your device. Server reports use readable transaction data."
+            accent="Clear"
+            title="about your data"
+            subtitle="Your encrypted vault backup and readable finance records are both saved in our database."
             visual={<PrivacyVisual />}
             tiles={[
               { icon: Lock, label: 'Encrypted vault backup' },
-              { icon: EyeOff, label: 'Server reports from your records' },
+              { icon: Database, label: 'Records for server reports' },
               { icon: KeyRound, label: 'Recovery key if you forget' },
             ]}
             cta={{ href: '/about#privacy', label: 'How we protect your data' }}
           >
-            Your spending is stored for reports when the Go backend is enabled. We do not sell it. No bank or M-Pesa connection is needed: you record each expense yourself, which is what makes you think twice.
+            We store your spending in our database to calculate reports, alongside an encrypted vault backup. No bank or M-Pesa connection is needed: you record each expense yourself, which helps you notice where your money goes.
           </Showcase>
         </div>
       </section>

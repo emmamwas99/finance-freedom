@@ -120,7 +120,7 @@ function ErrorText({ children }: { children: ReactNode }) {
 // ---------------------------------------------------------------------
 
 export function SignupPage() {
-  const { signUp } = useStore()
+  const { signUp, backendMode } = useStore()
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -198,7 +198,11 @@ export function SignupPage() {
         <div className="flex gap-3 rounded-lg bg-accent p-3 text-[13px] text-navy">
           <ShieldCheck className="mt-0.5 size-4 shrink-0" />
           <span>
-            Your vault backup is encrypted with this password before upload. In Go mode, readable finance records are also stored for server reports. Next you’ll get a recovery key in case you forget the password.
+            {backendMode === 'go'
+              ? 'Your vault backup is encrypted before upload. We also store readable finance records in our database for reports. Your password and recovery key stay on your device; you’ll receive the key after signup.'
+              : backendMode === 'supabase'
+                ? 'Your vault is encrypted on your device before upload. You’ll receive a recovery key after signup in case you forget your password.'
+                : 'This demo keeps your encrypted data in this browser. You’ll receive a recovery key after signup.'}
           </span>
         </div>
         <label className="flex items-start gap-2.5 text-sm">
@@ -371,7 +375,7 @@ export function ResetScreen() {
           </Field>
         ) : (
           <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-[13px] text-red-800">
-            Without the recovery key your old data can’t be decrypted, by anyone. Your account will start empty with the new password.
+            Without the recovery key, your old encrypted vault cannot be reopened. Starting fresh removes your previous app entries and creates an empty vault.
             <label className="mt-2 flex items-center gap-2">
               <Checkbox checked={confirmLost} onCheckedChange={(c) => setConfirmLost(c === true)} /> I understand my old data will be erased
             </label>
@@ -469,7 +473,7 @@ export function SetupScreen() {
   }
 
   return (
-    <AuthLayout title="Finish setting up" sub={<>Enter your password to create your encrypted space for <b>{user?.email}</b>.</>}>
+    <AuthLayout title="Finish setting up" sub={<>Enter your password to create the encrypted vault backup for <b>{user?.email}</b>.</>}>
       <form onSubmit={submit} className="grid gap-4">
         {!hasPending && (
           <div className="grid gap-4 sm:grid-cols-2">
@@ -504,7 +508,7 @@ export function RecoveryKeyScreen() {
   const text = `${BRAND.name} recovery key\nAccount: ${user?.email}\nCreated: ${todayISO()}\n\n${code}\n\nKeep this somewhere safe. You need it to reset your password. Anyone with this key AND access to your email could open your data.`
 
   return (
-    <AuthLayout title="Save your recovery key" sub="This is the only way back in if you forget your password. We can’t reset it for you, because we can’t read your data.">
+    <AuthLayout title="Save your recovery key" sub="If you forget your password, this key and an email reset link let you reopen your encrypted vault backup. Without the key, a password reset starts a new empty vault.">
       <div className="grid gap-5">
         <div className="rounded-xl border-2 border-dashed border-primary/40 bg-accent p-5 text-center">
           <KeyRound className="mx-auto mb-2 size-6 text-primary" />

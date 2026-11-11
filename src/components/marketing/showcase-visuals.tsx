@@ -10,15 +10,14 @@ import {
   CalendarCheck,
   CheckCircle2,
   Compass,
+  Database,
   HeartPulse,
-  KeyRound,
   ListChecks,
   Lock,
   Mountain,
   PiggyBank,
   Plus,
   Server,
-  ShieldCheck,
   Smartphone,
   Tags,
   Timer,
@@ -192,34 +191,28 @@ export function ProgressVisual() {
   )
 }
 
-/** Vault encryption and server reporting are separate data flows. */
+/** The account stores an encrypted vault and readable finance records. */
 export function PrivacyVisual() {
   return (
-    <Stage label="Illustration: the vault backup is encrypted on your device; readable finance records are also sent for server reports when enabled">
-      <Chip icon={ShieldCheck} className="top-[5%] left-1/2 -translate-x-1/2">
-        Encrypted vault backup
-      </Chip>
-      <Connector className="top-[45%] right-[20%] left-[20%]" />
-      <Chip icon={Smartphone} className="top-[45%] left-[3%] -translate-y-1/2">
+    <Stage label="Illustration: your device saves an encrypted vault backup and readable finance records to the Finfe database. The readable records are used for reports.">
+      <Chip icon={Smartphone} className="top-[5%] left-1/2 -translate-x-1/2">
         Your device
       </Chip>
-      <Chip icon={Server} className="top-[45%] right-[3%] -translate-y-1/2">
-        Finfe servers
+      <div className="absolute top-[28%] right-[5%] left-[5%] grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="flex min-h-24 flex-col items-center justify-center rounded-xl border border-border/80 bg-white p-2 text-center shadow-sm sm:min-h-28 sm:p-3">
+          <Lock className="size-5 text-primary sm:size-6" />
+          <span className="mt-1 text-[11px] font-semibold text-navy sm:text-[14px]">Encrypted vault</span>
+          <span className="text-[9px] text-muted-foreground sm:text-[12px]">Backup and recovery</span>
+        </div>
+        <div className="flex min-h-24 flex-col items-center justify-center rounded-xl border border-border/80 bg-white p-2 text-center shadow-sm sm:min-h-28 sm:p-3">
+          <Database className="size-5 text-primary sm:size-6" />
+          <span className="mt-1 text-[11px] font-semibold text-navy sm:text-[14px]">Finance records</span>
+          <span className="text-[9px] text-muted-foreground sm:text-[12px]">Readable for reports</span>
+        </div>
+      </div>
+      <Chip icon={Server} className="bottom-[7%] left-1/2 -translate-x-1/2">
+        Saved in Finfe’s database
       </Chip>
-      <div className="absolute top-[45%] left-1/2 flex aspect-square w-[22%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-navy shadow-[0_12px_30px_rgba(10,60,110,0.3)] ring-8 ring-white sm:w-[20%]">
-        <Lock className="size-1/3 text-white" />
-      </div>
-      <span className="absolute top-[66%] left-1/2 -translate-x-1/2 rounded-md border border-border/80 bg-white px-2 py-1 font-mono text-[10px] tracking-wider whitespace-nowrap text-muted-foreground shadow-sm sm:text-[12px]">
-        a7Fq·29xK·Lm3p·Qe8v
-      </span>
-      <div className="absolute bottom-[5%] left-1/2 flex -translate-x-1/2 gap-1.5 sm:gap-2">
-        <span className="flex items-center gap-1 rounded-full border border-border/80 bg-white px-2 py-0.5 text-[10px] whitespace-nowrap text-navy shadow-sm sm:px-2.5 sm:py-1 sm:text-[12px]">
-          <KeyRound className="size-3 text-primary" /> Recovery key
-        </span>
-        <span className="flex items-center gap-1 rounded-full border border-border/80 bg-white px-2 py-0.5 text-[10px] whitespace-nowrap text-navy shadow-sm sm:px-2.5 sm:py-1 sm:text-[12px]">
-          <Timer className="size-3 text-primary" /> Auto-lock
-        </span>
-      </div>
     </Stage>
   )
 }

@@ -236,8 +236,8 @@ export default function Body() {
         ]}
       />
       <p>
-        In Finfe, adding an expense takes a few taps, and ticking a planned payment such as rent or the SACCO loan records it for you. Your records are
-        encrypted and sync between your phone and computer. It’s <A href="/signup">free to start</A>.
+        In Finfe, adding an expense takes a few taps, and ticking a planned payment such as rent or the SACCO loan records it for you. Your records sync
+        between your phone and computer and are stored in our database for reports. The vault backup is encrypted. It’s <A href="/signup">free to start</A>.
       </p>
 
       <h2 id="weekly-review">What should a weekly review look like?</h2>

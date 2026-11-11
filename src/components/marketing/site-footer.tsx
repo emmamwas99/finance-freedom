@@ -11,7 +11,7 @@ export function SiteFooter() {
             <Image src="/logo.svg" alt="" width={28} height={28} className="size-7 rounded-md" />
             {SITE.name}
           </Link>
-          <p className="max-w-xs text-[14px] leading-relaxed text-muted-foreground">A private, encrypted budget planner for salaried Kenyans. Plan payments first, stop borrowing to get by, and see your debt-free date.</p>
+          <p className="max-w-xs text-[14px] leading-relaxed text-muted-foreground">A budget planner for salaried Kenyans. Plan payments first, track your spending across devices, and see your debt-free date.</p>
         </div>
         {FOOTER_NAV.map((col) => (
           <nav key={col.title} aria-label={col.title}>

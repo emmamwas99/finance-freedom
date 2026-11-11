@@ -19,7 +19,7 @@ export const SITE = {
   shortName: 'Finfe',
   tagline: 'Know exactly what’s left after every payment.',
   description:
-    'Finfe is a private, encrypted budget planner for Kenya. Plan your salary, track expenses, clear your loans and stop borrowing to get by. Free plan; Pro from KSh 299 a month with M-Pesa.',
+    'Finfe helps Kenyans plan salary, track expenses and clear loans. Finance records are saved for reports, while vault backups are encrypted. Free plan; Pro from KSh 299/month.',
   url: resolveSiteUrl(),
   locale: 'en_KE',
   language: 'en-KE',
@@ -56,7 +56,7 @@ export const EDITORIAL = {
 }
 
 /**
- * Links into the private app. Public pages don't prefetch these: the encrypted app bundle is large
+ * Links into the private app. Public pages don't prefetch these: the account app bundle is large
  * and most search visitors never open it, so prefetching would waste their mobile data.
  */
 export const isAccountPath = (href: string) => /^\/(app|login|signup|forgot|reset)(\/|$|\?)/.test(href)

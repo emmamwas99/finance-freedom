@@ -22,7 +22,7 @@ export const PAGES = {
   home: {
     path: '/',
     title: 'Finfe: budget planner and debt-free tracker for Kenya',
-    description: `Plan your salary, track daily expenses and see your debt-free date. A private, encrypted budget app for Kenya. Free plan; Pro from KSh ${PRICES.monthly.amount}/month with M-Pesa.`,
+    description: `Plan your salary, track expenses and see your debt-free date. Finance records are saved for reports; vault backups are encrypted. Free plan; Pro from KSh ${PRICES.monthly.amount}/month.`,
     kicker: 'Budget planner for Kenya',
     updated: UPDATED,
     changeFrequency: 'weekly',
@@ -42,7 +42,7 @@ export const PAGES = {
   expenseTracker: {
     path: '/expense-tracker',
     title: 'Expense tracker app for Kenya',
-    description: 'Track daily expenses in KSh, sort them into needs and wants, and get a warning before you overspend. Private, encrypted, and it works offline on your phone.',
+    description: 'Track daily expenses in KSh, sort them into needs and wants, and get a warning before you overspend. Works offline and syncs records to your account.',
     kicker: 'Expense tracker',
     updated: UPDATED,
     changeFrequency: 'monthly',
@@ -110,7 +110,7 @@ export const PAGES = {
   about: {
     path: '/about',
     title: 'About Finfe',
-    description: 'Why we built a private, payments-first budget planner for salaried Kenyans, how we protect your data, and how we write and review our money guides.',
+    description: 'Why we built a payments-first budget planner for salaried Kenyans, how we store and protect your data, and how we write and review our money guides.',
     kicker: 'About us',
     updated: UPDATED,
     changeFrequency: 'yearly',
@@ -128,7 +128,7 @@ export const PAGES = {
   privacy: {
     path: '/privacy',
     title: 'Privacy policy',
-    description: 'What Finfe processes: encrypted vault backups, readable finance records for server reports when enabled, account and payment data.',
+    description: 'How Finfe handles encrypted vault backups, readable finance records for reports, account details and payment data.',
     kicker: 'Privacy policy',
     updated: UPDATED,
     changeFrequency: 'yearly',

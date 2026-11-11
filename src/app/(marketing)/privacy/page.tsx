@@ -15,7 +15,7 @@ export default function PrivacyPage() {
       <section>
         <h2>What we store</h2>
         <p>
-          Your vault backup is encrypted on your device with a key made from your password. When the Go backend is enabled, we also store a readable copy of your income, expenses, loans, goals and plans in PostgreSQL so we can calculate server reports. We do not receive your password. In Supabase mode, financial records are stored only in the encrypted vault. The local demo keeps records in your browser.
+          For accounts using our Go service, your browser sends finance records to our server when it syncs. We store readable categories, income, expenses, budgets, loans, goals and planned payments in PostgreSQL to calculate reports. Our backend and authorized operators can read those records. Separately, your browser encrypts a vault backup before uploading it. We do not receive your password or recovery key. The older Supabase mode stores only the encrypted vault, and the local demo keeps records in your browser.
         </p>
       </section>
       <section>
@@ -27,8 +27,8 @@ export default function PrivacyPage() {
       <section>
         <h2>Data we do process</h2>
         <ul>
-          <li><b>Account data:</b> your email address and the date you joined.</li>
-          <li><b>Financial records in Go mode:</b> categories, transactions, budgets, loans, goals and plans used for reports.</li>
+          <li><b>Account data:</b> your email address, name, profile settings and the date you joined.</li>
+          <li><b>Financial records in Go mode:</b> readable categories, transactions, budgets, loans, goals and plans used for reports, plus an encrypted vault backup.</li>
           <li><b>Subscription and payment data:</b> plan, status, amounts, dates and Paystack references. Card and M-Pesa details are handled by Paystack. We do not see your full card number or M-Pesa PIN.</li>
           <li><b>Technical data:</b> basic logs (such as IP address and device type) kept for security and to fix problems.</li>
         </ul>

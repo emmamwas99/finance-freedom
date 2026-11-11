@@ -18,7 +18,7 @@ const ROWS: [string, boolean, boolean][] = [
   ['Unlimited expenses, income, loans and goals', true, true],
   ['Spending limits with 80% warnings', true, true],
   ['Debt-free date for every loan', true, true],
-  ['Encrypted sync on phone and computer, offline use', true, true],
+  ['Sync across phone and computer, encrypted vault backup and offline use', true, true],
   ['Monthly report card (plan vs actual)', false, true],
   ['Yearly reports and charts', false, true],
   ['“Am I on track?” 10-habit check', false, true],

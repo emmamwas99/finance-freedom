@@ -16,7 +16,7 @@ export function GET() {
   const body = [
     `# ${SITE.name}`,
     '',
-    `> ${SITE.name} (${SITE.nameMeaning}) is a budgeting web app for salaried people in ${SITE.country} (amounts in KSh). It plans each month "payments first" (income − planned payments = what's left), tracks expenses against spending limits with early warnings, projects a debt-free date for each loan, and checks ten money habits. The vault backup is encrypted on the user's device; readable finance records are stored for server reports when enabled.`,
+    `> ${SITE.name} (${SITE.nameMeaning}) is a budgeting web app for salaried people in ${SITE.country} (amounts in KSh). It plans each month "payments first" (income − planned payments = what's left), tracks expenses against spending limits with early warnings, projects a debt-free date for each loan, and checks ten money habits. Finfe stores readable finance records in its database for reports, alongside a vault backup encrypted on the user's device.`,
     '',
     `Pricing: Free plan; Pro costs KSh ${PRICES.monthly.amount} per month or KSh ${PRICES.yearly.amount} per year, with a ${TRIAL_DAYS}-day free trial. Payment by M-Pesa or card through Paystack. It does not connect to banks or M-Pesa accounts; users record transactions themselves.`,
     '',

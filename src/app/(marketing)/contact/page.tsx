@@ -30,7 +30,7 @@ export default function ContactPage() {
       <Prose className="mt-10">
         <h2 id="before">Before you write</h2>
         <ul>
-          <li><strong>Forgot your password?</strong> Use <A href="/forgot">reset password</A> with the recovery key you saved when you signed up. Because your data is encrypted with your password, we can’t reset it or read your data for you.</li>
+          <li><strong>Forgot your password?</strong> Use <A href="/forgot">reset password</A> with the recovery key you saved when you signed up. We store readable finance records for reports, but we cannot unlock your encrypted vault backup without your recovery key.</li>
           <li><strong>A payment question?</strong> Include the payment reference from the billing page in the app (never your M-Pesa PIN or card number).</li>
           <li><strong>Deleting your account?</strong> You can do it yourself any time in Settings → Delete account.</li>
         </ul>
