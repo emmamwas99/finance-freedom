@@ -38,7 +38,7 @@ export interface Profile {
 interface Ctx {
   status: Status
   user: CloudUser | null
-  backendMode: 'go' | 'supabase' | 'demo'
+  backendMode: 'go' | 'demo'
   data: AppData
   update: (fn: (d: AppData) => AppData) => void
 
@@ -409,7 +409,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const e = email.trim().toLowerCase()
       const master = await deriveMasterKeys(password, e)
       localStorage.setItem(PENDING_PROFILE, JSON.stringify(profile))
-      const res = await getBackend().signUp(e, master.loginSecret)
+      const res = await getBackend().signUp(e, master.loginSecret, profile.name)
       if (res.needsConfirmation || !res.user) return 'confirm-email'
       setUser(res.user)
       userRef.current = res.user

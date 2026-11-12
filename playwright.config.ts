@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test'
 const PORT = Number(process.env.E2E_PORT ?? 3100)
 
 /**
- * End-to-end tests against the production build in demo mode (no Supabase env needed).
+ * End-to-end tests against a production build with NEXT_PUBLIC_FINFE_DEMO_MODE=true.
  * Run `npm run build` first; Playwright starts `next start` itself unless one is already running.
  */
 export default defineConfig({

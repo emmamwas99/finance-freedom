@@ -4,7 +4,7 @@ import { AccountRoot } from '@/features/shell/account-root'
 
 /**
  * Private area. Vault encryption and offline editing happen in the browser;
- * server reports receive a readable projection in Go mode. The HTML is noindexed.
+ * server reports receive a readable finance projection. The HTML is noindexed.
  */
 export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },

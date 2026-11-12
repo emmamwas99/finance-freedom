@@ -171,7 +171,7 @@ function SyncIcon({ state }: { state: SyncState }) {
   return <Cloud className="size-3" />
 }
 
-function syncText(state: SyncState, mode: 'go' | 'supabase' | 'demo') {
+function syncText(state: SyncState, mode: 'go' | 'demo') {
   if (mode === 'demo') return 'Demo mode · this browser only'
   return state === 'synced' ? 'All changes synced' : state === 'offline' ? 'Offline · will sync later' : state === 'error' ? 'Sync problem · retrying' : 'Saving…'
 }

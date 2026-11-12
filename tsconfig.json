@@ -47,7 +47,6 @@
   ],
   "exclude": [
     "node_modules",
-    ".backup",
-    "supabase/functions/*/index.ts"
+    ".backup"
   ]
 }

@@ -1,7 +1,6 @@
 /**
  * DEMO backend: runs entirely in this browser (localStorage) so the full SaaS flow —
- * sign up, trial, checkout, Pro — can be tried before Supabase and Paystack are set up.
- * It is used automatically when VITE_SUPABASE_URL is not configured. Never use it in production.
+ * sign up, trial, checkout, Pro — available only when demo mode is explicitly enabled.
  */
 import { PRICES, TRIAL_DAYS, type PayMethod, type Period, type Subscription } from '@/lib/plans'
 import { ConflictError, type AuthEvent, type CloudBackend, type CloudUser, type PaymentRecord, type VaultRecord } from './backend'

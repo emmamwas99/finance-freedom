@@ -8,7 +8,7 @@
  *   data key is stored wrapped twice: with the key-encryption key, and with the recovery key
  *
  * The server never sees the password, master key or data key. In Go mode it
- * separately receives readable finance rows for SQL reports.
+ * separately receives readable finance records for server reports.
  */
 import { fromB64, toB64 } from '../crypto'
 
@@ -23,7 +23,7 @@ export interface Sealed {
 }
 
 export interface MasterKeys {
-  /** Goes to Supabase Auth as the account password. */
+  /** Goes to the Finfe API as the account password. */
   loginSecret: string
   kek: CryptoKey
 }

@@ -1,25 +1,26 @@
 import type { CloudBackend } from './backend'
 import { createDemoBackend } from './demoBackend'
-import { createSupabaseBackend } from './supabaseBackend'
 import { createGoBackend } from './goBackend'
 
-// Literal `process.env.NEXT_PUBLIC_*` reads so Next inlines them into the client bundle.
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const goURL = process.env.NEXT_PUBLIC_FINFE_API_URL
+const demo = process.env.NEXT_PUBLIC_FINFE_DEMO_MODE === 'true'
 
-/** True when a real Supabase project is configured; otherwise the app runs in demo mode. */
-export const backendMode: CloudBackend['mode'] = goURL ? 'go' : url && anon ? 'supabase' : 'demo'
+/** Demo storage must be selected explicitly; accounts use the Finfe API. */
+export const backendMode: CloudBackend['mode'] = demo ? 'demo' : 'go'
 
 let instance: CloudBackend | null = null
 
 /**
  * The backend is created on first use in the browser, never during server rendering:
- * the Supabase client keeps its session in localStorage and the demo backend lives there entirely.
+ * account sessions are held in HttpOnly cookies and demo data stays in this browser.
  */
 export function getBackend(): CloudBackend {
   if (typeof window === 'undefined') throw new Error('The cloud backend is only available in the browser')
-  instance ??= goURL ? createGoBackend(goURL) : url && anon ? createSupabaseBackend(url, anon) : createDemoBackend()
+  if (!instance) {
+    if (demo) instance = createDemoBackend()
+    else if (goURL) instance = createGoBackend(goURL)
+    else throw new Error('Finfe API URL is missing. Set NEXT_PUBLIC_FINFE_API_URL in .env.local.')
+  }
   return instance
 }
 

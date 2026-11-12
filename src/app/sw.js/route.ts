@@ -3,7 +3,7 @@
  * - App pages (/app, auth pages): network first, fall back to the last copy, so the encrypted app opens offline.
  * - Build assets (/_next/static): cache first. They're content-hashed and immutable.
  * - After the first app visit, every dashboard route and its scripts are warmed into the cache.
- * - Never touches cross-origin requests (Supabase, Paystack) or RSC data requests.
+ * - Never touches cross-origin requests (Finfe API, Paystack) or RSC data requests.
  */
 export const dynamic = 'force-static'
 

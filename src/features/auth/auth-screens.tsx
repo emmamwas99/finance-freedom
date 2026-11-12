@@ -200,9 +200,7 @@ export function SignupPage() {
           <span>
             {backendMode === 'go'
               ? 'Your vault backup is encrypted before upload. We also store readable finance records in our database for reports. Your password and recovery key stay on your device; you’ll receive the key after signup.'
-              : backendMode === 'supabase'
-                ? 'Your vault is encrypted on your device before upload. You’ll receive a recovery key after signup in case you forget your password.'
-                : 'This demo keeps your encrypted data in this browser. You’ll receive a recovery key after signup.'}
+              : 'This demo keeps your encrypted data in this browser. You’ll receive a recovery key after signup.'}
           </span>
         </div>
         <label className="flex items-start gap-2.5 text-sm">

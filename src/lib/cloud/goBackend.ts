@@ -27,8 +27,8 @@ export function createGoBackend(baseURL: string): CloudBackend {
       catch (e) { if (e instanceof ApiError && e.status === 401) return null; throw e }
     },
     onAuthChange(cb) { listeners.add(cb); return () => listeners.delete(cb) },
-    async signUp(email, loginSecret) {
-      const result = await call<{ user: CloudUser; needsConfirmation: boolean }>('/auth/register', 'POST', { email, password: loginSecret })
+    async signUp(email, loginSecret, name) {
+      const result = await call<{ user: CloudUser; needsConfirmation: boolean }>('/auth/register', 'POST', { email, password: loginSecret, name })
       if (!result.needsConfirmation) emit('SIGNED_IN', result.user)
       return result
     },
@@ -48,8 +48,8 @@ export function createGoBackend(baseURL: string): CloudBackend {
     },
     async getSubscription() { return (await call<SubResponse>('/billing/subscription')).subscription },
     async listPayments() {
-      const { payments } = await call<{ payments: Array<Omit<PaymentRecord, 'amount'> & { amount_minor: number }> }>('/billing/payments')
-      return payments.map(({ amount_minor, ...p }) => ({ ...p, amount: amount_minor / 100 }))
+      const { payments } = await call<{ payments: Array<{ reference: string; amount_minor: number; period: PaymentRecord['period']; method: string | null; status: PaymentRecord['status']; paid_at: string | null; created_at: string }> }>('/billing/payments')
+      return payments.map((p) => ({ reference: p.reference, amount: p.amount_minor / 100, period: p.period, method: p.method, status: p.status, paidAt: p.paid_at, createdAt: p.created_at }))
     },
     startCheckout(period, method) { return call<{ url: string; reference: string }>('/billing/checkout', 'POST', { period, method }) },
     verifyPayment(reference) { return call<{ status: string; subscription: Subscription | null }>('/billing/verify', 'POST', { reference }) },

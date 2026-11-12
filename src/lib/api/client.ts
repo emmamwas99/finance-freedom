@@ -2,7 +2,7 @@ export class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message) }
 }
 
-let refreshing: Promise<void> | null = null
+let refreshing: Promise<boolean> | null = null
 
 export async function api<T>(baseURL: string, path: string, options: RequestInit = {}): Promise<T> {
   const send = () => fetch(`${baseURL.replace(/\/$/, '')}/api/v1${path}`, {
@@ -14,9 +14,8 @@ export async function api<T>(baseURL: string, path: string, options: RequestInit
   if (res.status === 401 && !['/auth/refresh', '/auth/login', '/auth/register', '/auth/forgot-password', '/auth/verify-email', '/auth/recovery-session'].includes(path)) {
     refreshing ??= fetch(`${baseURL.replace(/\/$/, '')}/api/v1/auth/refresh`, {
       method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: '{}',
-    }).then((r) => { if (!r.ok) throw new Error('Session expired') }).finally(() => { refreshing = null })
-    await refreshing
-    res = await send()
+    }).then((r) => r.ok).catch(() => false).finally(() => { refreshing = null })
+    if (await refreshing) res = await send()
   }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))

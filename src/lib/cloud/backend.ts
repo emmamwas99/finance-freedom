@@ -41,11 +41,11 @@ export class OfflineError extends Error {
 }
 
 export interface CloudBackend {
-  mode: 'go' | 'supabase' | 'demo'
+  mode: 'go' | 'demo'
   getUser(): Promise<CloudUser | null>
   onAuthChange(cb: (event: AuthEvent, user: CloudUser | null) => void): () => void
   /** Returns needsConfirmation=true when the user must click the email link first. */
-  signUp(email: string, loginSecret: string): Promise<{ user: CloudUser | null; needsConfirmation: boolean }>
+  signUp(email: string, loginSecret: string, name: string): Promise<{ user: CloudUser | null; needsConfirmation: boolean }>
   signIn(email: string, loginSecret: string): Promise<CloudUser>
   signOut(): Promise<void>
   sendPasswordReset(email: string): Promise<void>

@@ -28,7 +28,7 @@ describe('account and sync workflow', () => {
     const master = await deriveMasterKeys(PASSWORD, EMAIL, IT)
 
     // 1. sign up: the server receives a derived secret, never the password
-    const { user, needsConfirmation } = await backend.signUp(EMAIL, master.loginSecret)
+    const { user, needsConfirmation } = await backend.signUp(EMAIL, master.loginSecret, 'Test User')
     expect(needsConfirmation).toBe(false)
     expect(user?.email).toBe(EMAIL)
     expect(master.loginSecret).not.toContain(PASSWORD)
@@ -96,7 +96,7 @@ describe('account and sync workflow', () => {
     const backend = createDemoBackend()
     const good = await deriveMasterKeys('right password', 'kamau@example.com', IT)
     const bad = await deriveMasterKeys('wrong password', 'kamau@example.com', IT)
-    await backend.signUp('kamau@example.com', good.loginSecret)
+    await backend.signUp('kamau@example.com', good.loginSecret, 'Kamau')
     const key = await newDataKey()
     const wrapped = await wrapDataKey(key, good.kek)
     await backend.signOut()

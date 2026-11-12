@@ -7,16 +7,8 @@ if (!isDev && !process.env.NEXT_PUBLIC_SITE_URL && !process.env.VERCEL_PROJECT_P
   console.warn('\n⚠  NEXT_PUBLIC_SITE_URL is not set: canonical URLs and the sitemap will point to http://localhost:3000.\n   Set it to your production address (e.g. https://yourdomain.co.ke) before deploying.\n')
 }
 
-/** Supabase origin from the public env (http(s) + websocket), so the CSP allows exactly that project. */
-function supabaseOrigins() {
-  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL
-  if (!raw) return []
-  try {
-    const u = new URL(raw)
-    return [u.origin, `wss://${u.host}`]
-  } catch {
-    return []
-  }
+if (!isDev && !process.env.NEXT_PUBLIC_FINFE_API_URL && process.env.NEXT_PUBLIC_FINFE_DEMO_MODE !== 'true') {
+  throw new Error('Set NEXT_PUBLIC_FINFE_API_URL to the Finfe backend URL before building the app.')
 }
 
 function apiOrigin() {
@@ -26,7 +18,7 @@ function apiOrigin() {
 
 /**
  * Content Security Policy. Static pages can't carry per-request nonces, so inline scripts
- * (Next's RSC payload) are allowed, but every *source* is pinned to this site and Supabase.
+ * (Next's RSC payload) are allowed, but every source is pinned to this site and the API.
  */
 const csp = [
   "default-src 'self'",
@@ -34,7 +26,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  `connect-src 'self' ${supabaseOrigins().join(' ')} ${apiOrigin()}`.trim(),
+  `connect-src 'self' ${apiOrigin()}`.trim(),
   "worker-src 'self'",
   "manifest-src 'self'",
   "frame-ancestors 'none'",

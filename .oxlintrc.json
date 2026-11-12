@@ -12,7 +12,6 @@
     ".next/**",
     "node_modules/**",
     ".backup/**",
-    "supabase/functions/*/index.ts",
     "playwright-report/**",
     "test-results/**"
   ],

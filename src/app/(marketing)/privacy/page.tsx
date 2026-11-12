@@ -15,7 +15,7 @@ export default function PrivacyPage() {
       <section>
         <h2>What we store</h2>
         <p>
-          For accounts using our Go service, your browser sends finance records to our server when it syncs. We store readable categories, income, expenses, budgets, loans, goals and planned payments in PostgreSQL to calculate reports. Our backend and authorized operators can read those records. Separately, your browser encrypts a vault backup before uploading it. We do not receive your password or recovery key. The older Supabase mode stores only the encrypted vault, and the local demo keeps records in your browser.
+          When your account syncs, your browser sends finance records to our server. We store readable categories, income, expenses, budgets, loans, goals and planned payments in MongoDB to calculate reports. Our backend and authorized operators can read those records. Separately, your browser encrypts a vault backup before uploading it. We do not receive your password or recovery key. An optional local demo keeps records in your browser.
         </p>
       </section>
       <section>
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
         <h2>Data we do process</h2>
         <ul>
           <li><b>Account data:</b> your email address, name, profile settings and the date you joined.</li>
-          <li><b>Financial records in Go mode:</b> readable categories, transactions, budgets, loans, goals and plans used for reports, plus an encrypted vault backup.</li>
+          <li><b>Financial records:</b> readable categories, transactions, budgets, loans, goals and plans used for reports, plus an encrypted vault backup.</li>
           <li><b>Subscription and payment data:</b> plan, status, amounts, dates and Paystack references. Card and M-Pesa details are handled by Paystack. We do not see your full card number or M-Pesa PIN.</li>
           <li><b>Technical data:</b> basic logs (such as IP address and device type) kept for security and to fix problems.</li>
         </ul>
@@ -45,8 +45,7 @@ export default function PrivacyPage() {
       <section>
         <h2>Who we share it with</h2>
         <ul>
-          <li>Our PostgreSQL hosting provider when Go mode is enabled; it stores readable finance records and encrypted vault backups.</li>
-          <li>Supabase when Supabase mode is configured; it stores encrypted vault data.</li>
+          <li>Our MongoDB hosting provider; it stores readable finance records and encrypted vault backups.</li>
           <li>Paystack (payment processing).</li>
           <li>Authorities, only when the law requires it.</li>
         </ul>

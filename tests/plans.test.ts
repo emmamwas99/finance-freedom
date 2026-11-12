@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isPro, isTrial, proUntil, type Subscription } from '../supabase/functions/_shared/plans'
+import { isPro, isTrial, proUntil, type Subscription } from '../src/lib/plans'
 
 const now = Date.parse('2026-11-11T12:00:00Z')
 const day = 864e5

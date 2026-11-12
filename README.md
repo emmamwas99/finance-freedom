@@ -5,17 +5,17 @@
 A budgeting SaaS for salaried Kenyans: plan the month, clear your loans, stop borrowing to get by. Built with **Next.js 16 (App Router)**.
 
 - **A public website built for search and answer engines:** static, server-rendered pages: a product site, free financial tools (6 calculators and a financial health check, no account needed), a financial education hub with 5 topic pages, 7 guides, a blog and a glossary, with full metadata, JSON-LD, a sitemap, robots.txt, Open Graph images and `llms.txt`.
-- **A private app with an encrypted vault:** the browser encrypts its vault backup and a recovery key covers forgotten passwords. Go mode also sends readable finance rows for server reports.
-- **Accounts and sync** through the adjacent Go backend, or the legacy Supabase backend. Phone and computer stay in step, and the app works offline (installable PWA).
+- **A private app with an encrypted vault:** the browser encrypts its vault backup and a recovery key covers forgotten passwords. The app also sends readable finance records for server reports.
+- **Accounts and sync** through the adjacent `finfe-backend` Go API. Phone and computer stay in step, and the app works offline (installable PWA).
 - **Free + Pro plans,** with a 14-day Pro trial. Pay with **M-Pesa or card through Paystack**.
 
-**Running without setup?** If neither `NEXT_PUBLIC_FINFE_API_URL` nor Supabase is set, the app runs in **demo mode**. For Go mode, start [the adjacent backend](../finfe-backend/README.md) and set `NEXT_PUBLIC_FINFE_API_URL=http://localhost:8080` in `.env.local`. The migration from the old Vite app is documented in [docs/MIGRATION-PLAN.md](docs/MIGRATION-PLAN.md).
+Start [the adjacent backend](../finfe-backend/README.md), then set `NEXT_PUBLIC_FINFE_API_URL=http://localhost:8080` in `.env.local`. See [API setup](API-SETUP.md) for local and production configuration. Browser-only demo mode requires `NEXT_PUBLIC_FINFE_DEMO_MODE=true`.
 
 ## Run it
 
 ```bash
 npm install
-npm run dev          # http://localhost:3000 (demo unless .env.local configures Go or Supabase)
+npm run dev          # http://localhost:3000 (connects to finfe-backend)
 npm run phone        # HTTPS dev server on your Wi-Fi, so encryption works on your phone
 npm run build && npm start   # production build
 ```
@@ -24,7 +24,7 @@ npm run build && npm start   # production build
 
 ```bash
 npm run verify       # lint + typecheck + unit/integration tests + production build
-npm test             # Vitest: money maths, debt engine, calculators, insights, crypto, sync, Paystack, DB rules, SEO
+npm test             # Vitest: money maths, debt engine, calculators, insights, crypto, sync, API client, SEO
 npm run test:e2e     # Playwright (desktop + mobile): sign-up → expense → lock/unlock, calculators, redirects, responsive layout
 npm run seo:audit    # crawl a running build like a search engine (BASE_URL=http://localhost:3000)
 ```
@@ -72,18 +72,17 @@ src/
   lib/
     calc.ts insights.ts        business rules (monthPlan, budgets, loans, forecasts, 10 habit checks)
     calculators/               pure, tested maths: debt engine (shared with the app), budget, emergency fund, savings goal, financial freedom, health check
-    crypto.ts cloud/           AES-GCM/PBKDF2, vault key hierarchy, three-way merge, Go + Supabase + demo backends
+    crypto.ts cloud/           AES-GCM/PBKDF2, vault key hierarchy, three-way merge, Go API + optional demo backend
     api/                       central HTTP client, generated OpenAPI types and TanStack Query hooks
     seo/                       metadata builder, Schema.org generators, page registry, route registry
-    plans.ts                   re-exports supabase/functions/_shared/plans.ts (prices shared with the server)
+    plans.ts                   web pricing and subscription rules; match Go billing prices
   config/site.ts               brand, site URL (from env), navigation, editorial author
   content/                     guides, blog, pillars, calculators copy, glossary (typed TSX, no MDX dependency)
   store/                       DataProvider (encrypted vault + sync + auto-lock) and UI state
-supabase/                      migrations (RLS, trial trigger, apply_payment) and Edge Functions (billing, Paystack webhook, account delete)
 tests/                         Vitest unit + integration tests     e2e/   Playwright tests     scripts/seo-audit.mjs
 ```
 
-**Server/client boundary.** Public pages are Server Components, prerendered at build time. The private app keeps vault decryption and offline edits in the browser. In Go mode, saved transactions are also sent as readable rows for SQL reports. Private pages are noindexed.
+**Server/client boundary.** Public pages are Server Components, prerendered at build time. The private app keeps vault decryption and offline edits in the browser. Saved finance records are also sent as readable documents for server reports. Private pages are noindexed.
 
 ## SEO, AEO and GEO
 
@@ -95,11 +94,11 @@ These are three different goals, kept separate on purpose. The full strategy, an
 
 ## Security
 
-The vault backup is encrypted in the browser (see `src/lib/cloud/keys.ts`). Go mode stores a readable finance projection for server reports; Supabase mode stores ciphertext only. The Go API uses owner-scoped PostgreSQL queries, rotating HttpOnly session cookies and rate limits. The site sends a Content-Security-Policy allowing the configured API origin, HSTS, `X-Frame-Options: DENY`, `nosniff`, a referrer policy and a permissions policy.
+The vault backup is encrypted in the browser (see `src/lib/cloud/keys.ts`). The Go API stores a readable finance projection in MongoDB for server reports and an encrypted vault backup. It uses owner-scoped MongoDB queries, rotating HttpOnly session cookies and rate limits. The site sends a Content-Security-Policy allowing the configured API origin, HSTS, `X-Frame-Options: DENY`, `nosniff`, a referrer policy and a permissions policy.
 
 ## Tech
 
-Next.js 16 (Turbopack) · React 19 · TypeScript 5 (strict) · TanStack Query · Tailwind CSS v4 · shadcn/ui (Radix) · Lucide · Recharts · Web Crypto API · Go/Chi/PostgreSQL or Supabase · Paystack · Vitest · Playwright · oxlint
+Next.js 16 (Turbopack) · React 19 · TypeScript 5 (strict) · TanStack Query · Tailwind CSS v4 · shadcn/ui (Radix) · Lucide · Recharts · Web Crypto API · Go/Chi/MongoDB · Paystack · Vitest · Playwright · oxlint
 
 Logo: a lowercase “f” whose crossbar is a rising arrow (`public/logo.svg`, and `public/logo-inverse.svg` for navy backgrounds). All icons are generated by `node scripts/generate-icons.mjs`.
 
