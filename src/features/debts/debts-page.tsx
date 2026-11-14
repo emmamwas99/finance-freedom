@@ -38,14 +38,14 @@ export function FreedomPage() {
     <div className="grid gap-8">
       <PageHeader
         title="Debts & goals"
-        subtitle="Clear the loans, then build the shop and your savings."
+        subtitle="Track what you still owe, record repayments, and see your path to financial freedom."
         action={
           <>
             <Button variant="outline" className="h-10" onClick={() => setGoalDlg({ open: true })}>
               <Plus /> Goal
             </Button>
             <Button className="h-10" onClick={() => setLoanDlg({ open: true })}>
-              <Plus /> Loan
+              <Plus /> Add debt
             </Button>
           </>
         }
@@ -55,10 +55,10 @@ export function FreedomPage() {
         <div className="grid gap-6">
           <Card>
             <CardContent className="grid gap-4">
-              <CardTitleRow title="Loans" sub="Highest interest first — that's the one to attack with any extra money." />
+              <CardTitleRow title="Debts you still owe" sub="Adding a debt records its balance, not an expense. Highest interest comes first." />
               {d.loans.length === 0 && closed.length === 0 ? (
-                <Empty title="No loans added" action={<Button onClick={() => setLoanDlg({ open: true })}><Plus /> Add a loan</Button>}>
-                  Add the shamba loan and any other debts (SACCO, bank, Fuliza, friends) to see when you'll be free.
+                <Empty title="No debts added" action={<Button onClick={() => setLoanDlg({ open: true })}><Plus /> Add a debt</Button>}>
+                  Add what you still owe to a SACCO, bank, Fuliza or a friend. Record actual repayments separately.
                 </Empty>
               ) : (
                 <div className="divide-y rounded-lg border">
@@ -194,7 +194,7 @@ export function FreedomPage() {
               ) : (
                 <>
                   <div>
-                    <p className="text-sm text-white/70">Total debt</p>
+                    <p className="text-sm text-white/70">Total still owed</p>
                     <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl">{m(d.total)}</p>
                   </div>
                   <div className="grid gap-2">

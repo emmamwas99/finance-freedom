@@ -2,26 +2,26 @@ import type { AppData, Category, CategoryKind } from './types'
 
 export const uid = () => crypto.randomUUID()
 
-const c = (name: string, emoji: string, kind: CategoryKind): Category => ({ id: uid(), name, emoji, kind, budget: 0 })
+const c = (name: string, kind: CategoryKind): Category => ({ id: uid(), name, emoji: '', kind, budget: 0 })
 
 export function defaultCategories(): Category[] {
   return [
-    c('Rent & Housing', '🏠', 'need'),
-    c('Food & Groceries', '🍲', 'need'),
-    c('Transport', '🚌', 'need'),
-    c('School Fees', '🎓', 'need'),
-    c('Maid / House Help', '🧹', 'need'),
-    c('Utilities (Power, Water, Wi-Fi)', '💡', 'need'),
-    c('Airtime & Data', '📱', 'need'),
-    c('Health', '🏥', 'need'),
-    c('Family Support', '👨‍👩‍👧', 'need'),
-    c('Shamba Loan', '🌱', 'debt'),
-    c('Other Loan Repayments', '💳', 'debt'),
-    c('Shop Investment', '🏪', 'invest'),
-    c('Savings & Emergency Fund', '💰', 'saving'),
-    c('Eating Out & Fun', '🎉', 'want'),
-    c('Clothes & Personal', '👕', 'want'),
-    c('Miscellaneous', '📦', 'want'),
+    c('Rent & Housing', 'need'),
+    c('Food & Groceries', 'need'),
+    c('Transport', 'need'),
+    c('School Fees', 'need'),
+    c('Maid / House Help', 'need'),
+    c('Utilities (Power, Water, Wi-Fi)', 'need'),
+    c('Airtime & Data', 'need'),
+    c('Health', 'need'),
+    c('Family Support', 'need'),
+    c('Shamba Loan', 'debt'),
+    c('Other Loan Repayments', 'debt'),
+    c('Shop Investment', 'invest'),
+    c('Savings & Emergency Fund', 'saving'),
+    c('Eating Out & Fun', 'want'),
+    c('Clothes & Personal', 'want'),
+    c('Miscellaneous', 'want'),
   ]
 }
 

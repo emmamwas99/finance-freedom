@@ -140,6 +140,21 @@ describe('loans and debt', () => {
     expect(loanBalance(d, d.loans[2])).toBe(0)
   })
 
+  it('keeps an amount owed separate from money paid out until a linked repayment is recorded', () => {
+    const debt = loan('friend', 12000, 2000, 0)
+    const owed = household({ loans: [debt] })
+    expect(debtOverview(owed).total).toBe(12000)
+    expect(summarize(owed, '2026-11').spent).toBe(0)
+
+    const unlinked = household({ loans: [debt], expenses: [exp('2026-11-02', 2000, 'loans')] })
+    expect(summarize(unlinked, '2026-11').debtPaid).toBe(2000)
+    expect(debtOverview(unlinked).total).toBe(12000)
+
+    const linked = household({ loans: [debt], expenses: [exp('2026-11-02', 2000, 'loans', { loanId: 'friend' })] })
+    expect(summarize(linked, '2026-11').spent).toBe(2000)
+    expect(debtOverview(linked).total).toBe(10000)
+  })
+
   it('debt-free date is the slowest loan, counted from this month', () => {
     const o = debtOverview(d)
     expect(o.total).toBe(162000 + 60000)

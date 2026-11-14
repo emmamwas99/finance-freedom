@@ -11,9 +11,9 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AmountInput, Field } from '@/components/app/shared'
 import { activeCategories, budgetLevel, goalSaved, loanBalance, plannedIncome, summarize } from '@/lib/calc'
-import { KIND_ORDER, uid } from '@/lib/defaults'
+import { KIND_LABEL, KIND_ORDER, uid } from '@/lib/defaults'
 import { monthOf, parseAmount, pct, todayISO } from '@/lib/format'
-import type { AppData, Expense, Income } from '@/lib/types'
+import type { AppData, Category, CategoryKind, Expense, Income } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { useFmt, useStore } from '@/store/data'
 import { useUI, type TxRequest } from '@/store/ui'
@@ -69,6 +69,7 @@ function useCategoryOrder(data: AppData) {
 
 function ExpenseForm({ req, onDone }: { req: Extract<TxRequest, { kind: 'expense' }>; onDone: () => void }) {
   const { data, update } = useStore()
+  const { go } = useUI()
   const { m } = useFmt()
   const original = req.id ? data.expenses.find((e) => e.id === req.id) : undefined
   const init = { ...original, ...req.preset }
@@ -76,12 +77,23 @@ function ExpenseForm({ req, onDone }: { req: Extract<TxRequest, { kind: 'expense
 
   const [amount, setAmount] = useState(init.amount ? String(init.amount) : '')
   const [categoryId, setCategoryId] = useState(init.categoryId ?? '')
+  const [categoryQuery, setCategoryQuery] = useState('')
+  const [newCategoryId] = useState(uid)
+  const [newCategoryKind, setNewCategoryKind] = useState<CategoryKind>('need')
   const [date, setDate] = useState(init.date ?? todayISO())
   const [note, setNote] = useState(init.note ?? '')
   const [loanId, setLoanId] = useState(init.loanId ?? '')
   const [goalId, setGoalId] = useState(init.goalId ?? '')
 
-  const cat = data.categories.find((c) => c.id === categoryId)
+  const normalizedCategory = categoryQuery.trim().replace(/\s+/g, ' ')
+  const existingByName = cats.find((c) => c.name.toLocaleLowerCase() === normalizedCategory.toLocaleLowerCase())
+  const newCategory: Category | null = normalizedCategory && !existingByName && !categoryId
+    ? { id: newCategoryId, name: normalizedCategory, emoji: '', kind: newCategoryKind, budget: 0 }
+    : null
+  const cat = data.categories.find((c) => c.id === categoryId) ?? existingByName ?? newCategory
+  const visibleCats = normalizedCategory
+    ? cats.filter((c) => c.name.toLocaleLowerCase().includes(normalizedCategory.toLocaleLowerCase()))
+    : cats
   const amt = parseAmount(amount)
   const openLoans = data.loans.filter((l) => !l.closed || l.id === loanId)
 
@@ -106,7 +118,8 @@ function ExpenseForm({ req, onDone }: { req: Extract<TxRequest, { kind: 'expense
 
   const save = () => {
     if (!amt) return toast.error('Enter an amount')
-    if (!cat) return toast.error('Pick a category')
+    if (!cat) return toast.error('Pick or type a category')
+    if (newCategory && new TextEncoder().encode(newCategory.name).length > 60) return toast.error('Category name is too long')
     const exp: Expense = {
       id: original?.id ?? uid(),
       createdAt: original?.createdAt ?? new Date().toISOString(),
@@ -120,11 +133,12 @@ function ExpenseForm({ req, onDone }: { req: Extract<TxRequest, { kind: 'expense
     }
     update((d) => ({
       ...d,
+      categories: newCategory ? [...d.categories, newCategory] : d.categories,
       expenses: original ? d.expenses.map((e) => (e.id === exp.id ? exp : e)) : [...d.expenses, exp],
     }))
     const over = warning?.find((w) => w.level === 'over')
     if (over) toast.warning('Over budget!', { description: over.text, duration: 6000 })
-    else toast.success(`${original ? 'Updated' : 'Saved'} ${m(amt)} · ${cat.name}`)
+    else toast.success(`${original ? 'Updated' : 'Saved'} ${m(amt)} · ${cat.name}`, newCategory ? { description: 'Category saved for next time.' } : undefined)
     onDone()
   }
 
@@ -139,6 +153,12 @@ function ExpenseForm({ req, onDone }: { req: Extract<TxRequest, { kind: 'expense
 
   return (
     <div className="grid gap-4">
+      {!original && (
+        <div className="rounded-lg border border-primary/25 bg-accent/40 p-3 text-sm">
+          <p><b className="text-navy">Still owe this money?</b> Add it as a debt. Record an expense only when money has actually left your pocket.</p>
+          <Button variant="link" className="mt-1 h-auto px-0" onClick={() => { onDone(); go('freedom') }}>Go to Debts</Button>
+        </div>
+      )}
       <AmountInput
         aria-label="Amount in KSh"
         autoFocus={!req.preset?.amount}
@@ -148,42 +168,68 @@ function ExpenseForm({ req, onDone }: { req: Extract<TxRequest, { kind: 'expense
         onKeyDown={(e) => e.key === 'Enter' && save()}
       />
 
-      <div>
-        <p className="mb-1.5 text-[13px] text-muted-foreground">Category</p>
-        <div className="grid max-h-56 grid-cols-3 gap-1.5 overflow-y-auto p-0.5 sm:grid-cols-4">
-          {cats.map((c) => (
+      <div className="grid gap-2">
+        <Field label="Category">
+          <Input
+            value={categoryQuery}
+            onChange={(e) => {
+              const value = e.target.value
+              setCategoryQuery(value)
+              setCategoryId(cats.find((c) => c.name.toLocaleLowerCase() === value.trim().replace(/\s+/g, ' ').toLocaleLowerCase())?.id ?? '')
+            }}
+            placeholder={cat && !categoryQuery ? cat.name : 'Search or type a new category'}
+            maxLength={60}
+            autoComplete="off"
+          />
+        </Field>
+        <div className="grid max-h-44 grid-cols-2 gap-1.5 overflow-y-auto p-0.5 sm:grid-cols-3">
+          {visibleCats.map((c) => (
             <button
               type="button"
               key={c.id}
-              onClick={() => setCategoryId(c.id)}
+              onClick={() => { setCategoryId(c.id); setCategoryQuery('') }}
               className={cn(
-                'flex flex-col items-center gap-1 rounded-lg border p-2 text-center text-[12px] leading-tight transition-colors',
+                'rounded-lg border px-3 py-2 text-left text-[13px] leading-tight transition-colors',
                 c.id === categoryId ? 'border-primary bg-primary/10 font-medium ring-1 ring-primary' : 'hover:bg-muted',
               )}
             >
-              <span className="text-xl">{c.emoji}</span>
-              <span className="line-clamp-2">{c.name}</span>
+              {c.name}
             </button>
           ))}
         </div>
+        {newCategory && (
+          <div className="grid gap-2 rounded-lg border border-dashed bg-muted/30 p-3">
+            <p className="text-sm">“{newCategory.name}” will be saved as a category with this expense.</p>
+            <Field label="Category type">
+              <Select value={newCategoryKind} onValueChange={(value) => setNewCategoryKind(value as CategoryKind)}>
+                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {KIND_ORDER.map((kind) => <SelectItem key={kind} value={kind}>{KIND_LABEL[kind]}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+        )}
       </div>
 
-      {cat?.kind === 'debt' && openLoans.length > 0 && (
-        <Field label="Which loan does this repay?">
-          <Select value={loanId || 'none'} onValueChange={(v) => setLoanId(v === 'none' ? '' : v)}>
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Not linked</SelectItem>
-              {openLoans.map((l) => (
-                <SelectItem key={l.id} value={l.id}>
-                  {l.name} · {m(loanBalance(data, l))} left
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+      {cat?.kind === 'debt' && (
+        <div className="grid gap-2">
+          {openLoans.length > 0 ? (
+            <Field label="Which debt did you repay?" hint="Linking this payment reduces that debt's balance.">
+              <Select value={loanId || 'none'} onValueChange={(v) => setLoanId(v === 'none' ? '' : v)}>
+                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No debt linked — balance will not change</SelectItem>
+                  {openLoans.map((l) => (
+                    <SelectItem key={l.id} value={l.id}>{l.name} · {m(loanBalance(data, l))} left</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          ) : (
+            <p className="text-sm text-muted-foreground">This payment will count as money out. Add the debt first if you want to track how much you still owe.</p>
+          )}
+        </div>
       )}
 
       {(cat?.kind === 'invest' || cat?.kind === 'saving') && data.goals.length > 0 && (
@@ -196,7 +242,7 @@ function ExpenseForm({ req, onDone }: { req: Extract<TxRequest, { kind: 'expense
               <SelectItem value="none">Not linked</SelectItem>
               {data.goals.map((g) => (
                 <SelectItem key={g.id} value={g.id}>
-                  {g.emoji} {g.name} · {m(goalSaved(data, g.id))} / {m(g.target)}
+                  {g.name} · {m(goalSaved(data, g.id))} / {m(g.target)}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -1,6 +1,6 @@
 'use client'
 
-import { Copy, HandCoins, MoreHorizontal, Pencil, Trash2, Wallet } from 'lucide-react'
+import { Copy, HandCoins, MoreHorizontal, Pencil, Receipt, Trash2, Wallet } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -32,7 +32,7 @@ export function TxRow({ tx, wide }: { tx: TxItem; wide?: boolean }) {
     const c = data.categories.find((x) => x.id === e.categoryId)
     const loan = e.loanId ? data.loans.find((l) => l.id === e.loanId) : null
     const goal = e.goalId ? data.goals.find((g) => g.id === e.goalId) : null
-    icon = <span className="text-lg">{c?.emoji ?? '•'}</span>
+    icon = <Receipt className="size-4 text-muted-foreground" />
     title = e.note || c?.name || 'Expense'
     category = c?.name ?? '—'
     sub = [wide ? null : e.note ? c?.name : dayLabel(e.date), loan && `repays ${loan.name}`, goal && `towards ${goal.name}`].filter(Boolean).join(' · ')

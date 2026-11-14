@@ -69,7 +69,7 @@ export function CategoryDialog({ id, open, onOpenChange }: { id?: string; open: 
   const { data } = useStore()
   const c = id ? data.categories.find((x) => x.id === id) : undefined
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={c ? `${c.emoji} ${c.name}` : 'New category'}>
+    <Sheet open={open} onOpenChange={onOpenChange} title={c ? c.name : 'New category'}>
       <CategoryForm key={id ?? 'new'} c={c} done={() => onOpenChange(false)} />
     </Sheet>
   )
@@ -79,7 +79,6 @@ function CategoryForm({ c, done }: { c?: Category; done: () => void }) {
   const { data, update } = useStore()
   const { m } = useFmt()
   const [name, setName] = useState(c?.name ?? '')
-  const [emoji, setEmoji] = useState(c?.emoji ?? '📦')
   const [kind, setKind] = useState<CategoryKind>(c?.kind ?? 'need')
   const [budget, setBudget] = useState(c?.budget ? String(c.budget) : '')
   const avg = c ? (averageByCategory(data, currentMonth())[c.id] ?? 0) : 0
@@ -87,7 +86,7 @@ function CategoryForm({ c, done }: { c?: Category; done: () => void }) {
 
   const save = () => {
     if (!name.trim()) return toast.error('Give it a name')
-    const next: Category = { id: c?.id ?? uid(), name: name.trim(), emoji, kind, budget: parseAmount(budget), archived: c?.archived }
+    const next: Category = { id: c?.id ?? uid(), name: name.trim(), emoji: '', kind, budget: parseAmount(budget), archived: c?.archived }
     update((d) => ({ ...d, categories: c ? d.categories.map((x) => (x.id === c.id ? next : x)) : [...d.categories, next] }))
     done()
   }
@@ -123,9 +122,6 @@ function CategoryForm({ c, done }: { c?: Category; done: () => void }) {
             ))}
           </SelectContent>
         </Select>
-      </Field>
-      <Field label="Icon">
-        <EmojiPicker value={emoji} onChange={setEmoji} />
       </Field>
       <Footer onDelete={c ? remove : undefined} onSave={save} />
     </div>
@@ -232,7 +228,7 @@ function BillForm({ b, monthKey, done }: { b?: Bill; monthKey: string; done: () 
           <SelectContent>
             {cats.map((c) => (
               <SelectItem key={c.id} value={c.id}>
-                {c.emoji} {c.name}
+                {c.name}
               </SelectItem>
             ))}
           </SelectContent>

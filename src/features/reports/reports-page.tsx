@@ -147,7 +147,6 @@ function YearlyReport({ onOpenMonth }: { onOpenMonth: (k: string) => void }) {
                 return (
                   <div key={c.id} className="grid grid-cols-[minmax(0,200px)_minmax(0,1fr)_auto] items-center gap-4">
                     <span className="truncate text-[15px]">
-                      <span className="mr-2">{c.emoji}</span>
                       {c.name}
                     </span>
                     <div className="h-2 overflow-hidden rounded-full bg-muted">

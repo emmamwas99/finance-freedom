@@ -5,7 +5,7 @@ import { useFmt } from '@/store/data'
 
 export const SERIES = {
   earned: { label: 'Income', color: 'var(--series-income)' },
-  spent: { label: 'Spending', color: 'var(--series-spent)' },
+  spent: { label: 'Money paid out', color: 'var(--series-spent)' },
   income: { label: 'Expected income', color: 'var(--series-income)' },
   payments: { label: 'Planned payments', color: 'var(--series-spent)' },
 } as const

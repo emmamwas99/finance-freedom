@@ -146,7 +146,6 @@ export function PlanPage() {
                       <div key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_130px_150px]">
                         <button className="min-w-0 text-left" onClick={() => setCatDlg({ open: true, id: c.id })}>
                           <span className="block truncate text-[15px]">
-                            <span className="mr-2">{c.emoji}</span>
                             {c.name}
                           </span>
                           {c.budget > 0 && <Bar className="mt-2" value={spent / c.budget} level={lvl} />}
@@ -286,7 +285,7 @@ function AddPayment({ data, monthKey }: { data: AppData; monthKey: string }) {
           <SelectContent>
             {cats.map((c) => (
               <SelectItem key={c.id} value={c.id}>
-                {c.emoji} {c.name}
+                {c.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -387,7 +386,7 @@ function PaymentRow({ p, monthKey, onEdit }: { p: PlannedPayment; monthKey: stri
         </p>
       </div>
       <span className="hidden truncate text-sm text-muted-foreground md:block">
-        {cat?.emoji} {cat?.name}
+        {cat?.name}
       </span>
       <div className="col-start-2 row-start-2 md:col-start-auto md:row-start-auto md:text-right">
         {p.paid ? (

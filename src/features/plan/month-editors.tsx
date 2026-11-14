@@ -171,7 +171,7 @@ function IncomeForm({ monthKey, done }: { monthKey: string; done: () => void }) 
 }
 
 // ---------------------------------------------------------------------
-// Spending in a month (the "Spent so far" number, fully editable)
+// Every recorded outgoing transaction in a month, including debt repayments.
 // ---------------------------------------------------------------------
 
 export function MonthSpendingSheet({ monthKey, open, onOpenChange }: { monthKey: string; open: boolean; onOpenChange: (o: boolean) => void }) {
@@ -179,8 +179,8 @@ export function MonthSpendingSheet({ monthKey, open, onOpenChange }: { monthKey:
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full gap-0 overflow-x-hidden overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:max-w-xl">
         <SheetHeader className="border-b p-6">
-          <SheetTitle className="text-lg text-navy">Spending in {monthLabel(monthKey)}</SheetTitle>
-          <SheetDescription>Edit or delete any expense, or add spending you didn't record.</SheetDescription>
+          <SheetTitle className="text-lg text-navy">Money paid out in {monthLabel(monthKey)}</SheetTitle>
+          <SheetDescription>Includes living expenses, debt repayments, savings and investments. Edit or delete a transaction here.</SheetDescription>
         </SheetHeader>
         {open && <SpendingList monthKey={monthKey} close={() => onOpenChange(false)} />}
       </SheetContent>
@@ -224,7 +224,7 @@ function SpendingList({ monthKey, close }: { monthKey: string; close: () => void
     <div className="grid grid-cols-1 gap-6 p-6 [&>*]:min-w-0">
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-sm text-muted-foreground">Total spent</p>
+          <p className="text-sm text-muted-foreground">Total money paid out</p>
           <p className="text-3xl font-semibold text-navy tabular-nums">{m(total)}</p>
         </div>
         <Button
@@ -249,7 +249,7 @@ function SpendingList({ monthKey, close }: { monthKey: string; close: () => void
             <SelectContent>
               {cats.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
-                  {c.emoji} {c.name}
+                  {c.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -268,7 +268,6 @@ function SpendingList({ monthKey, close }: { monthKey: string; close: () => void
             const c = data.categories.find((x) => x.id === e.categoryId)
             return (
               <div key={e.id} className="flex items-center gap-3 px-3 py-2.5">
-                <span className="text-lg">{c?.emoji}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[15px]">{e.note || c?.name}</span>
                   <span className="block truncate text-[13px] text-muted-foreground">

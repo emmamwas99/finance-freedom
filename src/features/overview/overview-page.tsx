@@ -7,11 +7,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { MonthlyBars } from '@/components/app/charts'
 import { Bar, CardTitleRow, Empty, MonthSwitcher, Notice, PageHeader, Stat } from '@/components/app/shared'
 import { IncomeDialog, MonthSpendingSheet } from '@/features/plan/month-editors'
+import { LoanDialog } from '@/features/editors/editors'
 import { StatusBadge } from '@/components/app/status'
 import { TxRow, toItems } from '@/features/transactions/tx-list'
 import { progressCheck } from '@/lib/insights'
 import { activeCategories, budgetLevel, dailyAllowance, debtOverview, levelText, monthPlan, summarize, totalBudget } from '@/lib/calc'
-import { currentMonth, monthLabel, monthOf, pct, shiftMonth } from '@/lib/format'
+import { currentMonth, monthLabel, monthOf, shiftMonth } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useFmt, useStore } from '@/store/data'
 import { useUI } from '@/store/ui'
@@ -28,10 +29,13 @@ export function HomePage() {
   const [key, setKey] = useState(currentMonth())
   const [incomeOpen, setIncomeOpen] = useState(false)
   const [spentOpen, setSpentOpen] = useState(false)
+  const [loanOpen, setLoanOpen] = useState(false)
   const plan = useMemo(() => monthPlan(data, key), [data, key])
   const s = plan.summary
   const allowance = dailyAllowance(data, key, s)
   const debt = debtOverview(data)
+  const livingSpent = s.byKind.need + s.byKind.want
+  const otherOut = s.saved + s.invested
   const progress = useMemo(() => progressCheck(data), [data])
   const warnAt = data.settings.warnAt
   const isNow = key === currentMonth()
@@ -84,7 +88,7 @@ export function HomePage() {
     <div className="grid gap-8">
       <PageHeader
         title={`${greeting()}${data.settings.name ? `, ${data.settings.name}` : ''}`}
-        subtitle={isNow ? "Here's where your money stands this month." : `Looking at ${monthLabel(key)}.`}
+        subtitle={isNow ? "See what you still owe, what you've paid, and what's left this month." : `Looking at ${monthLabel(key)}.`}
         action={
           <>
             <MonthSwitcher value={key} onChange={setKey} />
@@ -98,34 +102,80 @@ export function HomePage() {
         }
       />
 
+      <Card className="border-primary/30 bg-accent/30">
+        <CardContent className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+          <div className="grid gap-1.5">
+            <p className="text-sm font-medium text-navy">Debt still owed today</p>
+            <p className="text-3xl font-semibold tracking-tight text-navy tabular-nums">{m(debt.total)}</p>
+            <p className="text-sm text-muted-foreground">
+              {debt.total > 0
+                ? debt.freeKey
+                  ? `At your planned repayments, you could be debt free by ${monthLabel(debt.freeKey)}.`
+                  : 'Add or increase monthly repayments to see your path to debt freedom.'
+                : data.loans.length ? 'You have cleared the debts you recorded.' : 'Add what you owe to see your path to debt freedom.'}
+            </p>
+            {debt.originalTotal > 0 && <Bar value={debt.paidTotal / debt.originalTotal} className="max-w-sm" />}
+          </div>
+          <div className="flex flex-wrap gap-2 sm:flex-col">
+            <Button onClick={() => setLoanOpen(true)}><Plus /> Add a debt</Button>
+            <Button variant="outline" onClick={() => go('freedom')}>View debts <ArrowRight /></Button>
+          </div>
+        </CardContent>
+      </Card>
+      <LoanDialog open={loanOpen} onOpenChange={setLoanOpen} />
+
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Stat
-          label="Income"
+          label="Income used for this plan"
           action="Edit"
           onClick={() => setIncomeOpen(true)}
           value={m(plan.income)}
           sub={s.earned === 0 && plan.income > 0 ? 'Expected (not received yet)' : s.earned > 0 && s.earned < plan.income ? `${m(s.earned)} received so far` : 'Received'}
         />
         <Stat
-          label="Payments"
-          action="Open"
-          onClick={() => go('plan')}
-          value={m(plan.paymentsTotal)}
-          sub={plan.payments.length ? `${paidCount} of ${plan.payments.length} paid · ${m(plan.toPay)} to go` : 'None planned yet'}
+          label="Living expenses paid"
+          value={m(livingSpent)}
+          sub="Food, rent, transport and other needs or wants"
         />
-        <Stat label="Spent so far" action="Edit" onClick={() => setSpentOpen(true)} value={m(s.spent)} sub={plan.income > 0 ? `${pct(s.spent / plan.income)} of income` : undefined} />
+        <Stat
+          label="Debt repayments recorded"
+          value={m(s.debtPaid)}
+          sub="Payments marked as debt; link them to reduce a debt balance"
+        />
         <Stat
           highlight
-          label="Remaining"
+          label="Left after bills and spending"
           action="Plan"
           onClick={() => go('plan')}
           value={m(plan.remaining)}
           tone={plan.remaining < 0 ? 'bad' : undefined}
-          sub={allowance && plan.remaining > 0 ? `About ${m(plan.remaining / allowance.daysLeft)} a day for ${allowance.daysLeft} days` : 'After all payments'}
+          sub={allowance && plan.remaining > 0 ? `After spending and unpaid planned bills · about ${m(plan.remaining / allowance.daysLeft)} a day` : 'After spending and unpaid planned bills'}
         />
       </div>
+      <Card>
+        <CardContent className="grid gap-3">
+          <CardTitleRow title="Understand your totals" sub={`For ${monthLabel(key)}, a debt balance is separate from money paid out.`} />
+          <div className="grid gap-2 text-sm sm:grid-cols-2">
+            <p><b className="text-navy">Money paid out:</b> {m(s.spent)} = {m(livingSpent)} living expenses + {m(s.debtPaid)} debt repayments + {m(otherOut)} savings and investments.</p>
+            <p><b className="text-navy">Still to pay in {monthLabel(key, 'tiny')}:</b> {m(plan.toPay)} in planned bills and repayments. This is already set aside in the amount left.</p>
+          </div>
+          <Button variant="link" className="h-auto justify-self-start px-0" onClick={() => setSpentOpen(true)}>Review money paid out <ArrowRight /></Button>
+        </CardContent>
+      </Card>
       <IncomeDialog monthKey={key} open={incomeOpen} onOpenChange={setIncomeOpen} />
       <MonthSpendingSheet monthKey={key} open={spentOpen} onOpenChange={setSpentOpen} />
+
+      <Card>
+        <CardContent className="grid gap-4">
+          <CardTitleRow title="Debt, expense or repayment?" sub="Choose the right place so your debt progress stays accurate." />
+          <div className="grid gap-3 text-sm sm:grid-cols-3">
+            <p><b className="block text-navy">Debt</b> Money you still owe, such as Fuliza, a SACCO loan or money borrowed from a friend. Add it under Debts.</p>
+            <p><b className="block text-navy">Living expense</b> Money you already paid for food, rent, transport or other daily needs. Add an expense.</p>
+            <p><b className="block text-navy">Debt repayment</b> Money you paid towards a debt. Open that debt and record a payment so its balance goes down.</p>
+          </div>
+          <p className="text-[13px] text-muted-foreground">Entered an amount you owe as an expense? Remove that transaction, then add the amount under Debts.</p>
+        </CardContent>
+      </Card>
 
       {notices.length > 0 && (
         <div className="grid gap-2">
@@ -152,8 +202,8 @@ export function HomePage() {
           <Card>
             <CardContent className="grid gap-4">
               <CardTitleRow
-                title="Income vs spending"
-                sub="Last 6 months. Click a month to look at it."
+                title="Earned income vs money paid out"
+                sub="Money paid out includes living costs, debt repayments, savings and investments. Click a month to look at it."
                 action={
                   <Button variant="ghost" size="sm" onClick={() => go('stats')}>
                     Reports <ArrowRight />
@@ -176,7 +226,7 @@ export function HomePage() {
               />
               {recent.length === 0 ? (
                 <Empty title="Nothing recorded yet">
-                  Click <b>Add expense</b> (or press <kbd className="rounded border px-1">N</kbd>) every time you spend.
+                  Record an expense when you spend, or add a debt when you owe money.
                 </Empty>
               ) : (
                 <div className="-mx-2 divide-y">
@@ -193,7 +243,7 @@ export function HomePage() {
           <Card>
             <CardContent className="grid gap-4">
               <CardTitleRow
-                title="Payments this month"
+                title="Bills and repayments planned this month"
                 action={
                   <Button variant="ghost" size="sm" onClick={() => go('plan')}>
                     Plan <ArrowRight />
@@ -215,37 +265,12 @@ export function HomePage() {
                   ))}
                   {plan.payments.length > 7 && <p className="text-[13px] text-muted-foreground">+{plan.payments.length - 7} more</p>}
                   <div className="mt-1 flex justify-between border-t pt-3 text-sm">
-                    <span className="text-muted-foreground">Left after payments</span>
+                    <span className="text-muted-foreground">Income left after planned payments</span>
                     <b className={cn('tabular-nums', plan.afterPayments < 0 ? 'text-red-600' : 'text-navy')}>{m(plan.afterPayments)}</b>
                   </div>
+                  <p className="text-[13px] text-muted-foreground">{paidCount} of {plan.payments.length} paid · {m(plan.toPay)} still to pay</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="grid gap-3">
-              <CardTitleRow
-                title="Debt"
-                action={
-                  <Button variant="ghost" size="sm" onClick={() => go('freedom')}>
-                    Details <ArrowRight />
-                  </Button>
-                }
-              />
-              <p className="text-2xl font-semibold text-navy tabular-nums">{m(debt.total)}</p>
-              <p className="text-sm text-muted-foreground">
-                {debt.total === 0 ? (
-                  data.loans.length ? 'You are debt free. 🎉' : 'No loans added yet.'
-                ) : debt.freeKey ? (
-                  <>
-                    Debt-free by <b className="text-navy">{monthLabel(debt.freeKey)}</b> at {m(debt.monthly)}/month
-                  </>
-                ) : (
-                  'Monthly payments are too low to clear your debts.'
-                )}
-              </p>
-              {debt.originalTotal > 0 && <Bar value={debt.paidTotal / debt.originalTotal} />}
             </CardContent>
           </Card>
 

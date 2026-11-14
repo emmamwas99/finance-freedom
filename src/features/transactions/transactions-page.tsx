@@ -51,7 +51,7 @@ export function ActivityPage() {
     <div className="grid gap-8">
       <PageHeader
         title="Transactions"
-        subtitle="Every shilling in and out. Click a row to edit it."
+        subtitle="Money received and paid out. A debt you still owe belongs under Debts. Click a row to edit it."
         action={
           <>
             <MonthSwitcher value={key} onChange={setKey} />
@@ -64,8 +64,8 @@ export function ActivityPage() {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         <Stat label="Money in (earned)" value={m(s.earned)} sub={s.borrowed > 0 ? `+ ${m(s.borrowed)} borrowed` : undefined} />
-        <Stat label="Money out" value={m(s.spent)} sub={`${s.count} expenses`} />
-        <Stat label="Difference" value={m(s.net)} tone={s.net < 0 ? 'bad' : undefined} />
+        <Stat label="Money paid out" value={m(s.spent)} sub={`${m(s.byKind.need + s.byKind.want)} living · ${m(s.debtPaid)} debt · ${m(s.saved + s.invested)} saved/invested`} />
+        <Stat label="Earned minus paid out" value={m(s.net)} sub="Borrowed money is excluded from income" tone={s.net < 0 ? 'bad' : undefined} />
       </div>
 
       <Card>
@@ -94,7 +94,7 @@ export function ActivityPage() {
                 <SelectItem value="all">All categories</SelectItem>
                 {data.categories.map((c) => (
                   <SelectItem key={c.id} value={c.id}>
-                    {c.emoji} {c.name}
+                    {c.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -121,7 +121,7 @@ export function ActivityPage() {
               <div className="mt-2 flex justify-between border-t px-2 pt-3 text-sm text-muted-foreground">
                 <span>{items.length} transactions</span>
                 <span>
-                  Total out <b className="text-foreground tabular-nums">{m(shownOut)}</b>
+                  Money paid out shown <b className="text-foreground tabular-nums">{m(shownOut)}</b>
                 </span>
               </div>
             </div>

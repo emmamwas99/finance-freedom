@@ -15,8 +15,8 @@ import { ROUTE_PATHS, useUI, type Route } from '@/store/ui'
 const NAV: { route: Route; label: string; short: string; icon: typeof List }[] = [
   { route: 'home', label: 'Overview', short: 'Home', icon: LayoutDashboard },
   { route: 'plan', label: 'Monthly plan', short: 'Plan', icon: CalendarCheck },
-  { route: 'activity', label: 'Transactions', short: 'Activity', icon: List },
   { route: 'freedom', label: 'Debts & goals', short: 'Debts', icon: Mountain },
+  { route: 'activity', label: 'Transactions', short: 'Activity', icon: List },
   { route: 'stats', label: 'Reports', short: 'Reports', icon: BarChart3 },
   { route: 'insights', label: 'Am I on track?', short: 'On track', icon: Compass },
 ]
