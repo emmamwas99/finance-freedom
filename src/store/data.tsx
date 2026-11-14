@@ -18,6 +18,7 @@ import {
   type Sealed,
 } from '@/lib/cloud/keys'
 import { merge3, sameData } from '@/lib/cloud/merge'
+import { clearCurrentSessionUnlock, clearSessionUnlock, rememberSessionUnlock, rememberedSessionUnlock, setSessionUnlockIdle, touchSessionUnlock } from '@/lib/cloud/session-unlock'
 import { isVault, newSession, seal, unseal } from '@/lib/crypto'
 import { emptyData } from '@/lib/defaults'
 import { money, moneyCompact } from '@/lib/format'
@@ -27,7 +28,7 @@ import type { AppData } from '@/lib/types'
 import { useQueryClient } from '@tanstack/react-query'
 import { validateSignup } from '@/lib/api/validation'
 
-export type Status = 'loading' | 'signed-out' | 'locked' | 'setup' | 'recovery-key' | 'reset' | 'unlocked'
+export type Status = 'loading' | 'connection-error' | 'signed-out' | 'locked' | 'setup' | 'recovery-key' | 'reset' | 'unlocked'
 export type SyncState = 'synced' | 'pending' | 'syncing' | 'offline' | 'error'
 
 export interface Profile {
@@ -310,6 +311,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       }
       await writeCache()
       if (dirty.current) schedulePush()
+      await rememberSessionUnlock(u.id, master.kek, dataRef.current?.settings.autoLockMinutes ?? 5).catch(() => undefined)
       return true
     },
     [applyData, writeCache, schedulePush],
@@ -335,6 +337,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       dirty.current = false
       applyData(initial)
       await writeCache()
+      await rememberSessionUnlock(u.id, master.kek, initial.settings.autoLockMinutes).catch(() => undefined)
       localStorage.removeItem(PENDING_PROFILE)
       setRecoveryCode(code)
       setStatus('recovery-key')
@@ -351,10 +354,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const afterUnlock = useCallback(async () => {
+  const afterUnlock = useCallback(async (subscription?: Promise<Subscription | null>) => {
     setStatus('unlocked')
     void requestPersistence()
-    await refreshSubscription()
+    await (subscription ?? refreshSubscription())
   }, [refreshSubscription])
 
   // ---------------- startup ----------------
@@ -362,9 +365,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      const u = await getBackend().getUser().catch(() => null)
+      let u: CloudUser | null
+      try {
+        u = await getBackend().getUser()
+      } catch {
+        if (!cancelled) setStatus('connection-error')
+        return
+      }
       if (cancelled) return
       if (!u) {
+        await clearCurrentSessionUnlock().catch(() => undefined)
         setStatus('signed-out')
         return
       }
@@ -374,6 +384,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (window.location.pathname === '/reset') {
         setStatus('reset')
         return
+      }
+      const remembered = await rememberedSessionUnlock(u.id).catch(() => null)
+      if (cancelled) return
+      if (remembered) {
+        try {
+          if (await openVault(u, { kek: remembered, loginSecret: '' })) {
+            if (!cancelled) await afterUnlock()
+            return
+          }
+        } catch {
+          await clearSessionUnlock(u.id).catch(() => undefined)
+        }
       }
       try {
         const v = await getBackend().getVault()
@@ -399,7 +421,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       cancelled = true
       off()
     }
-  }, [])
+  }, [afterUnlock, openVault])
 
   // ---------------- auth actions ----------------
 
@@ -413,8 +435,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (res.needsConfirmation || !res.user) return 'confirm-email'
       setUser(res.user)
       userRef.current = res.user
-      await createVault(res.user, master, profile)
-      await refreshSubscription()
+      try {
+        await createVault(res.user, master, profile)
+        await refreshSubscription()
+      } catch {
+        throw new Error('Your account was created, but setup could not finish. Log in with the same email and password to finish setup.')
+      }
       return 'ok'
     },
     [createVault, refreshSubscription],
@@ -427,13 +453,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const u = await getBackend().signIn(e, master.loginSecret)
       setUser(u)
       userRef.current = u
+      setSubscription(readSub(u.id))
+      const subscription = refreshSubscription()
       const opened = await openVault(u, master)
       if (!opened) {
         await createVault(u, master, pendingProfile())
-        await refreshSubscription()
+        await subscription
         return
       }
-      await afterUnlock()
+      await afterUnlock(subscription)
     },
     [openVault, createVault, afterUnlock, refreshSubscription],
   )
@@ -479,6 +507,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     if (dirty.current) await push().catch(() => undefined)
     await writeCache()
     await chain.current
+    if (userRef.current) await clearSessionUnlock(userRef.current.id).catch(() => undefined)
     clearMemory()
     setStatus(userRef.current ? 'locked' : 'signed-out')
   }, [push, writeCache])
@@ -491,6 +520,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     if (u) {
       localStorage.removeItem(cacheKey(u.id)) // don't leave data on shared computers
       localStorage.removeItem(subKey(u.id))
+      await clearSessionUnlock(u.id).catch(() => undefined)
     }
     clearMemory()
     userRef.current = null
@@ -535,7 +565,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(cacheKey(u.id))
         await openVault(u, master)
         window.history.replaceState(null, '', '/app')
-      }).then(afterUnlock),
+      }).then(() => afterUnlock()),
     [serial, openVault, afterUnlock],
   )
 
@@ -571,6 +601,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const nv = await getBackend().getVault()
         wrappedKeyRef.current = nv?.wrappedKey ?? null
         await writeCache()
+        await rememberSessionUnlock(u.id, master.kek, fresh.settings.autoLockMinutes).catch(() => undefined)
         setRecoveryCode(code)
         setStatus('recovery-key')
       }),
@@ -600,6 +631,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         if (vault.version === baseVersion.current) baseVersion.current = v
         wrappedKeyRef.current = newWrapped
         await writeCache()
+        await rememberSessionUnlock(u.id, master.kek, dataRef.current?.settings.autoLockMinutes ?? 5).catch(() => undefined)
       }),
     [serial, writeCache],
   )
@@ -672,6 +704,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     if (u) {
       localStorage.removeItem(cacheKey(u.id))
       localStorage.removeItem(subKey(u.id))
+      await clearSessionUnlock(u.id).catch(() => undefined)
     }
     clearMemory()
     userRef.current = null
@@ -712,9 +745,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (status !== 'unlocked') return
     const limit = autoLockMin * 60_000
+    if (userRef.current) setSessionUnlockIdle(userRef.current.id, autoLockMin)
     let last = Date.now()
     let hiddenAt = 0
-    const bump = () => (last = Date.now())
+    const bump = () => {
+      last = Date.now()
+      if (userRef.current) touchSessionUnlock(userRef.current.id)
+    }
     const onVis = () => {
       if (document.visibilityState === 'hidden') hiddenAt = Date.now()
       else if (hiddenAt && Date.now() - hiddenAt >= limit) void lock()

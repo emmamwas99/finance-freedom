@@ -7,18 +7,13 @@ if (!isDev && !process.env.NEXT_PUBLIC_SITE_URL && !process.env.VERCEL_PROJECT_P
   console.warn('\n⚠  NEXT_PUBLIC_SITE_URL is not set: canonical URLs and the sitemap will point to http://localhost:3000.\n   Set it to your production address (e.g. https://yourdomain.co.ke) before deploying.\n')
 }
 
-if (!isDev && !process.env.NEXT_PUBLIC_FINFE_API_URL && process.env.NEXT_PUBLIC_FINFE_DEMO_MODE !== 'true') {
-  throw new Error('Set NEXT_PUBLIC_FINFE_API_URL to the Finfe backend URL before building the app.')
-}
-
-function apiOrigin() {
-  try { return process.env.NEXT_PUBLIC_FINFE_API_URL ? new URL(process.env.NEXT_PUBLIC_FINFE_API_URL).origin : '' }
-  catch { return '' }
+if (!isDev && !process.env.FINFE_API_URL && !process.env.NEXT_PUBLIC_FINFE_API_URL && process.env.NEXT_PUBLIC_FINFE_DEMO_MODE !== 'true') {
+  throw new Error('Set FINFE_API_URL to the Finfe backend URL before building the app.')
 }
 
 /**
  * Content Security Policy. Static pages can't carry per-request nonces, so inline scripts
- * (Next's RSC payload) are allowed, but every source is pinned to this site and the API.
+ * (Next's RSC payload) are allowed, but browser requests stay on this site.
  */
 const csp = [
   "default-src 'self'",
@@ -26,7 +21,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  `connect-src 'self' ${apiOrigin()}`.trim(),
+  "connect-src 'self'",
   "worker-src 'self'",
   "manifest-src 'self'",
   "frame-ancestors 'none'",

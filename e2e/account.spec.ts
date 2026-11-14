@@ -27,7 +27,7 @@ test('private routes send signed-out visitors to log in, and are noindex', async
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
 })
 
-test('sign up → add an expense → lock → unlock → reload: data survives, encrypted', async ({ page }) => {
+test('sign up → add an expense → lock → unlock → reload: session stays unlocked', async ({ page }) => {
   const email = `e2e-${Date.now()}@example.com`
   await signUp(page, email)
 
@@ -60,12 +60,14 @@ test('sign up → add an expense → lock → unlock → reload: data survives, 
   await page.getByRole('button', { name: 'Unlock' }).click()
   await expect(page.getByText('Naivas').first()).toBeVisible({ timeout: 30_000 })
 
-  // a full reload starts locked and decrypts the same data
+  // a full reload restores the session key without storing the password
+  await page.reload()
+  await expect(page.getByText('Naivas').first()).toBeVisible({ timeout: 30_000 })
+
+  // an explicit lock clears the remembered key, including across reloads
+  await page.getByRole('button', { name: 'Lock' }).first().click()
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Unlock' })).toBeVisible()
-  await page.getByLabel('Password', { exact: true }).fill(PASSWORD)
-  await page.getByRole('button', { name: 'Unlock' }).click()
-  await expect(page.getByText('Naivas').first()).toBeVisible({ timeout: 30_000 })
 })
 
 test('monthly plan: add a payment and see what is left after payments', async ({ page }) => {
@@ -78,9 +80,6 @@ test('monthly plan: add a payment and see what is left after payments', async ({
 test('Pro pages and billing work in demo mode (trial gives Pro)', async ({ page }) => {
   await signUp(page, `pro-${Date.now()}@example.com`)
   await page.goto('/app/reports')
-  // full reload locks the vault first
-  await page.getByLabel('Password', { exact: true }).fill(PASSWORD)
-  await page.getByRole('button', { name: 'Unlock' }).click()
   await expect(page.getByRole('heading', { name: 'Reports', level: 1 })).toBeVisible({ timeout: 30_000 })
   await page.getByRole('link', { name: /Pro trial/ }).first().click()
   await expect(page).toHaveURL(/\/app\/billing$/)

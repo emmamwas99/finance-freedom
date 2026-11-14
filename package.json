@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev-full.mjs",
+    "dev:web": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "oxlint --deny-warnings",

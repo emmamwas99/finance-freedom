@@ -11,7 +11,7 @@ export async function api<T>(baseURL: string, path: string, options: RequestInit
     headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...options.headers },
   })
   let res = await send()
-  if (res.status === 401 && !['/auth/refresh', '/auth/login', '/auth/register', '/auth/forgot-password', '/auth/verify-email', '/auth/recovery-session'].includes(path)) {
+  if (res.status === 401 && !['/auth/refresh', '/auth/login', '/auth/register', '/auth/forgot-password', '/auth/resend-verification', '/auth/verify-email', '/auth/recovery-session'].includes(path)) {
     refreshing ??= fetch(`${baseURL.replace(/\/$/, '')}/api/v1/auth/refresh`, {
       method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: '{}',
     }).then((r) => r.ok).catch(() => false).finally(() => { refreshing = null })

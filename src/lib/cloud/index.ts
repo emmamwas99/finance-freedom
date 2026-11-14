@@ -2,7 +2,6 @@ import type { CloudBackend } from './backend'
 import { createDemoBackend } from './demoBackend'
 import { createGoBackend } from './goBackend'
 
-const goURL = process.env.NEXT_PUBLIC_FINFE_API_URL
 const demo = process.env.NEXT_PUBLIC_FINFE_DEMO_MODE === 'true'
 
 /** Demo storage must be selected explicitly; accounts use the Finfe API. */
@@ -18,8 +17,7 @@ export function getBackend(): CloudBackend {
   if (typeof window === 'undefined') throw new Error('The cloud backend is only available in the browser')
   if (!instance) {
     if (demo) instance = createDemoBackend()
-    else if (goURL) instance = createGoBackend(goURL)
-    else throw new Error('Finfe API URL is missing. Set NEXT_PUBLIC_FINFE_API_URL in .env.local.')
+    else instance = createGoBackend('')
   }
   return instance
 }

@@ -4,7 +4,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Suspense, useEffect, useSyncExternalStore, type ReactNode } from 'react'
 import { Toaster } from 'sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { ForgotPage, RecoveryKeyScreen, ResetScreen, SetupScreen, Splash, UnlockScreen } from '@/features/auth/auth-screens'
+import { AuthLayout, ForgotPage, RecoveryKeyScreen, ResetScreen, SetupScreen, Splash, UnlockScreen } from '@/features/auth/auth-screens'
+import { Button } from '@/components/ui/button'
 import { DataProvider, useStore } from '@/store/data'
 import { QueryProvider } from '@/lib/api/query-provider'
 
@@ -48,6 +49,12 @@ function Gate({ children }: { children: ReactNode }) {
   if (status === 'loading') return <Splash />
 
   if (path === '/verify-email') return <>{children}</>
+
+  if (status === 'connection-error') return (
+    <AuthLayout title="Connection interrupted" sub="We couldn't check your saved session. Your account is still here.">
+      <Button className="w-full" onClick={() => window.location.reload()}>Try again</Button>
+    </AuthLayout>
+  )
 
   if (status === 'signed-out') {
     if (path === '/reset') return <ForgotPage />

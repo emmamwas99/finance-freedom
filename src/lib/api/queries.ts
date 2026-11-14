@@ -17,11 +17,9 @@ export type SavingsInput = Schemas['SavingsAccountInput']
 export type Goal = Schemas['Goal']
 export type GoalInput = Schemas['GoalInput']
 
-const base = process.env.NEXT_PUBLIC_FINFE_API_URL
 const path = (name: string, id?: string) => `/${name}${id ? `/${encodeURIComponent(id)}` : ''}`
 const request = <T,>(p: string, options?: RequestInit) => {
-  if (!base) throw new Error('Go API is not configured')
-  return api<T>(base, p, options)
+  return api<T>('', p, options)
 }
 const json = (method: string, body: unknown): RequestInit => ({ method, body: JSON.stringify(body) })
 type Page<T> = { data: T[]; page: number; limit: number; total: number }
@@ -31,12 +29,12 @@ function useList<T>(name: string, filters: Filters = {}) {
   const search = new URLSearchParams()
   for (const [k, v] of Object.entries(filters)) if (v !== undefined && v !== '') search.set(k, String(v))
   return useQuery({
-    queryKey: [name, 'list', filters], enabled: backendMode === 'go' && !!base,
+    queryKey: [name, 'list', filters], enabled: backendMode === 'go',
     queryFn: ({ signal }) => request<Page<T>>(`${path(name)}${search.size ? `?${search}` : ''}`, { signal }),
   })
 }
 function useItem<T>(name: string, id: string | undefined) {
-  return useQuery({ queryKey: [name, 'detail', id], enabled: backendMode === 'go' && !!base && !!id, queryFn: ({ signal }) => request<{ data: T }>(path(name, id), { signal }) })
+  return useQuery({ queryKey: [name, 'detail', id], enabled: backendMode === 'go' && !!id, queryFn: ({ signal }) => request<{ data: T }>(path(name, id), { signal }) })
 }
 function useCreate<T>(name: string) {
   const query = useQueryClient()
@@ -72,12 +70,12 @@ export const useUpdateGoal = () => useUpdate<GoalInput>('goals')
 export const useDeleteGoal = () => useDelete('goals')
 
 export function useMonthlyReport(month: string) {
-  return useQuery({ queryKey: ['reports', 'monthly', month], enabled: backendMode === 'go' && !!base,
+  return useQuery({ queryKey: ['reports', 'monthly', month], enabled: backendMode === 'go',
     queryFn: ({ signal }) => request<Schemas['MonthlyReport']>(`/reports/monthly?month=${encodeURIComponent(month)}`, { signal }),
   })
 }
 export function useFinancialHealth() {
-  return useQuery({ queryKey: ['reports', 'financial-health'], enabled: backendMode === 'go' && !!base,
+  return useQuery({ queryKey: ['reports', 'financial-health'], enabled: backendMode === 'go',
     queryFn: ({ signal }) => request<unknown>('/financial-health/overview', { signal }),
   })
 }

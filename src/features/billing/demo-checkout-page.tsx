@@ -18,15 +18,14 @@ export function DemoCheckoutPage() {
   const { backendMode } = useStore()
   const [goCheckout, setGoCheckout] = useState<{ period: 'monthly' | 'yearly'; method: 'mpesa' | 'card' } | null>(null)
   useEffect(() => {
-    const base = process.env.NEXT_PUBLIC_FINFE_API_URL
-    if (backendMode !== 'go' || !base || !ref) return
-    api<{ checkout: { period: 'monthly' | 'yearly'; method: 'mpesa' | 'card' } }>(base, `/billing/demo/${encodeURIComponent(ref)}`)
+    if (backendMode !== 'go' || !ref) return
+    api<{ checkout: { period: 'monthly' | 'yearly'; method: 'mpesa' | 'card' } }>('', `/billing/demo/${encodeURIComponent(ref)}`)
       .then((r) => setGoCheckout(r.checkout)).catch(() => setGoCheckout(null))
   }, [backendMode, ref])
   const c = backendMode === 'go' ? goCheckout : demoCheckout(ref)
   const back = async (paid: boolean) => {
-    if (backendMode === 'go' && process.env.NEXT_PUBLIC_FINFE_API_URL) {
-      await api(process.env.NEXT_PUBLIC_FINFE_API_URL, `/billing/demo/${encodeURIComponent(ref)}`, { method: 'POST', body: JSON.stringify({ paid }) })
+    if (backendMode === 'go') {
+      await api('', `/billing/demo/${encodeURIComponent(ref)}`, { method: 'POST', body: JSON.stringify({ paid }) })
     } else if (paid) demoMarkPaid(ref)
     router.replace(`/app/billing?reference=${encodeURIComponent(ref)}`)
   }

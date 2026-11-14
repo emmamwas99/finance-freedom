@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { toast } from 'sonner'
+import { api, ApiError } from '@/lib/api/client'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -152,7 +153,7 @@ export function SignupPage() {
 
   if (sent)
     return (
-      <AuthLayout title="Check your email" sub={<>We sent a confirmation link to <b>{email}</b>.</>}>
+      <AuthLayout title="Check your email" sub={<>A confirmation link is on its way to <b>{email}</b>.</>}>
         <div className="grid gap-4 text-[15px]">
           <MailCheck className="size-10 text-primary" />
           <p>Click the link in the email, then log in with your password to finish setting up.</p>
@@ -236,17 +237,36 @@ export function LoginPage() {
   const [pw, setPw] = useState('')
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
+  const [needsVerification, setNeedsVerification] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [resent, setResent] = useState(false)
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     setErr('')
+    setNeedsVerification(false)
+    setResent(false)
     setBusy(true)
     try {
       await signIn(email, pw)
       router.replace('/app')
     } catch (ex) {
       setErr((ex as Error).message)
+      setNeedsVerification(ex instanceof ApiError && ex.code === 'email_unverified')
       setBusy(false)
+    }
+  }
+
+  const resendVerification = async () => {
+    setResending(true)
+    setErr('')
+    try {
+      await api('', '/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email: email.trim().toLowerCase() }) })
+      setResent(true)
+    } catch (ex) {
+      setErr((ex as Error).message)
+    } finally {
+      setResending(false)
     }
   }
 
@@ -276,6 +296,13 @@ export function LoginPage() {
           </Link>
         </div>
         <ErrorText>{err}</ErrorText>
+        {needsVerification && (
+          <div className="grid gap-2 rounded-lg border bg-accent p-3 text-sm">
+            <p>Check your inbox for a confirmation link. If you need a new one, request it here.</p>
+            <Button type="button" variant="outline" disabled={resending} onClick={resendVerification}>Resend confirmation email</Button>
+            {resent && <p>If this account still needs confirmation, a new link is on its way.</p>}
+          </div>
+        )}
         <Submit busy={busy}>Log in</Submit>
       </form>
     </AuthLayout>
@@ -320,7 +347,7 @@ export function ForgotPage() {
       {sent ? (
         <div className="grid gap-4 text-[15px]">
           <MailCheck className="size-10 text-primary" />
-          <p>If an account exists for <b>{email}</b>, we’ve sent a link to reset the password.</p>
+          <p>If an account exists for <b>{email}</b>, a password reset link is on its way.</p>
           {backendMode === 'demo' && (
             <Button onClick={() => (window.location.href = '/reset')}>Open the reset link (demo)</Button>
           )}
